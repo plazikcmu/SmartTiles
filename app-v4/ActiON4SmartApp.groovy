@@ -43,6 +43,7 @@ preferences {
 		}
 		
 		section("Shortcuts...") {
+			href "dashboards", title:"Link other dashboards"
 			href "links", title:"Configure shortcuts"
 		}
 		
@@ -55,6 +56,7 @@ preferences {
 	page(name: "controlThings", title: "controlThings")
 	page(name: "videoStreams", title: "videoStreams")
 	page(name: "videoStreamsMJPEG", title: "videoStreamsMJPEG")
+	page(name: "dashboards", title: "dashboards")
 	page(name: "links", title: "links")
 	page(name: "moreTiles", title: "moreTiles")
 	page(name: "preferences", title: "preferences")
@@ -63,7 +65,7 @@ preferences {
 }
 
 def controlThings() {
-	dynamicPage(name: "controlThings", title: "Things", install:false) {
+	dynamicPage(name: "controlThings", title: "Things", install: false) {
 		section("Control these things...") {
 			input "holiday", "capability.switch", title: "Which Holiday Lights?", multiple: true, required: false
 			input "switches", "capability.switch", title: "Which Switches?", multiple: true, required: false
@@ -90,7 +92,7 @@ def controlThings() {
 }
 
 def videoStreams() {
-	dynamicPage(name: "videoStreams", title: "Video Streams", install:false) {
+	dynamicPage(name: "videoStreams", title: "Video Streams", install: false) {
 		section("About") {
 			paragraph "Enter absolute URL of the stream starting with http..."
 			href url:"http://action-dashboard.github.io", style:"embedded", required:false, title:"More information..."
@@ -108,7 +110,7 @@ def videoStreams() {
 }
 
 def videoStreamsMJPEG() {
-	dynamicPage(name: "videoStreamsMJPEG", title: "Generic MJPEG Video Streams", install:false) {
+	dynamicPage(name: "videoStreamsMJPEG", title: "Generic MJPEG Video Streams", install: false) {
 		section("About") {
 			paragraph "Enter absolute URL starting with http..."
 			paragraph "For Foscam cameras use http://DOMAIN:PORT/videostream.cgi?&user=USERNAME&pwd=PASSWORD"
@@ -129,7 +131,11 @@ def videoStreamsMJPEG() {
 }
 
 def links() {
-	dynamicPage(name: "links", title: "Shortcuts", install:false) {
+	dynamicPage(name: "links", title: "Shortcuts", install: false) {
+		section() {
+			paragraph "Enter absolute URL starting with http..."
+		}
+		
 		(1..10).each{
 			def title = "linkTitle$it"
 			def link = "linkUrl$it"
@@ -142,8 +148,25 @@ def links() {
 	}
 }
 
+def dashboards() {
+	dynamicPage(name: "dashboards", title: "Dashboards", install: false) {
+		section() {
+			paragraph "Enter absolute URL starting with https..."
+		}
+		(1..10).each{
+			def title = "dashboardTitle$it"
+			def link = "dashboardUrl$it"
+			log.debug "t: $t, l: $l"
+			section("Dashboard $it") {
+				input title, "text", title:"Title", required: false
+				input link, "text", title:"URL", required: false
+			}
+		}
+	}
+}
+
 def moreTiles() {
-	dynamicPage(name: "moreTiles", title: "More Tiles...", install:false) {
+	dynamicPage(name: "moreTiles", title: "More Tiles...", install: false) {
 		section() {
 			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
 			input "showHelloHome", title: "Hello, Home! Actions", "bool", required: true, defaultValue: true
@@ -153,7 +176,7 @@ def moreTiles() {
 }
 
 def preferences() {
-	dynamicPage(name: "preferences", title: "Preferences...", install:false) {
+	dynamicPage(name: "preferences", title: "Preferences...", install: false) {
 		section("Preferences...") {
 			label title: "Title", required: false, defaultValue: "ActiON4"
 			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
@@ -175,7 +198,7 @@ def preferences() {
 }
 
 def authenticationPreferences() {
-	dynamicPage(name: "authenticationPreferences", title: "Access and Authentication", install:false) {
+	dynamicPage(name: "authenticationPreferences", title: "Access and Authentication", install: false) {
 		section() {
 			input "disableDashboard", "bool", title: "Disable temporarily (hide all tiles)?", defaultValue: false, required:false
 			input "readOnlyMode", "bool", title: "View only mode?", defaultValue: false, required:false
@@ -426,12 +449,15 @@ def head() {
 var stateTS = ${getStateTS()};
 var tileSize = ${getTSize()};
 var readOnlyMode = ${readOnlyMode ?: false};
+var icons = ${getTileIcons().encodeAsJSON()};
+var smartAppVersion = "4.6";
 </script>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
 <script src="https://625alex.github.io/ActiON-Dashboard/coolclock.min.js" type="text/javascript"></script>
-<script src="https://625alex.github.io/ActiON-Dashboard/script.min.4.5.js?v=6" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/freewall.js?v=6" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/script.tmp.js?v=6" type="text/javascript"></script>
 
 
 <style>
@@ -600,6 +626,8 @@ def renderTile(data) {
 	} else if (data.tile == "device") {
 		return """<div class="$data.type tile $data.active" data-active="$data.active" data-type="$data.type" data-device="$data.device" data-value="$data.value" data-level="$data.level" data-is-value="$data.isValue"><div class="title">$data.name</div></div>"""
 	} else if (data.tile == "link") {
+		return """<div class="link tile" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon"><a href="$data.link" data-ajax="false" style="color:white"><i class="fa fa-th"></i></a></div></div>"""
+	} else if (data.tile == "dashboard") {
 		return """<div class="link tile" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon"><a href="$data.link" data-ajax="false" style="color:white"><i class="fa fa-link"></i></a></div></div>"""
 	} else if (data.tile == "video") {
 		return """<div class="video tile h2 w2" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><param name="movie" value="$data.link"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param><embed src="$data.link" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="240" height="164" wmode="opaque"></embed></object></div></div>"""
@@ -620,6 +648,27 @@ def renderTile(data) {
 	}
 	
 	return ""
+}
+
+def getTileIcons() {
+	[
+		"switch" : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
+		light : [off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
+		holiday : [off: "<i class='inactive fa fa-tree'></i>", on : "<i class='active fa fa-tree'></i>"],
+		lock : [locked : "<i class='inactive fa fa-lock'></i></div>", unlocked : "<i class='fa fa-unlock-alt'></i>"],
+		motion : [active : "<i class='active fa fa-exchange'></i>", inactive: "<div class='icon'><i class='inactive fa fa-exchange'></i>"],
+		presence : [present : "<i class='active fa fa-map-marker'></i>", notPresent: "<i class='inactive fa fa-map-marker'></i>"],
+		contact : [open : "<i class='active r45 fa fa-expand'>", closed: "<i class='inactive r45 fa fa-compress'></i>"],
+		water : [dry : "<i class='inactive fa fa-tint'></i></div>", wet: "<i class='active fa fa-tint'></i>"],
+		momentary : "<i class='fa fa-circle-o'></i>",
+		camera : "<i class='fa fa-camera'></i>",
+		refresh : "<i class='fa fa-refresh'></i>",
+		humidity : "<i class='fa fa-fw wi wi-sprinkles'></i>",
+		temperature : "<i class='fa fa-fw wi wi-thermometer'></i>",
+		energy : "<i class='fa fa-fw wi wi-lightning'></i>",
+		power : "<i class='fa fa-fw fa-bolt'></i>",
+		battery : "<i class='fa fa-fw batt'></i>"
+	]
 }
 
 def getListIcon(type) {
@@ -743,6 +792,7 @@ def allDeviceData() {
 	battery?.each{data << getDeviceData(it, "battery")}
 	
 	(1..10).each{if (settings["linkUrl$it"]) {data << [tile: "link", link: settings["linkUrl$it"], name: settings["linkTitle$it"] ?: "Link $it", i: it, type: "link"]}}
+	(1..10).each{if (settings["dashboardUrl$it"]) {data << [tile: "dashboard", link: settings["dashboardUrl$it"], name: settings["dashboardTitle$it"] ?: "Dashboard $it", i: it, type: "link"]}}
 	
 	data << refresh
 	
