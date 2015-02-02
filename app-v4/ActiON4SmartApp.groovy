@@ -583,7 +583,6 @@ def renderHelloHomeTile(data) {
 """
 <div class="hello-home tile menu" data-rel="popup" data-popup="hello-home-popup">
 	<div class="title">Hello, Home!</div>
-	<div class="icon"><i class="fa fa-comment-o"></i></div>
 	<div data-role="popup" id="hello-home-popup" data-overlay-theme="b">
 		<ul data-role="listview" data-inset="true" style="min-width:210px;">
 			${data.phrases.collect{"""<li data-icon="false">$it</li>"""}.join("\n")}
@@ -628,7 +627,7 @@ def renderTile(data) {
 	} else if (data.tile == "link") {
 		return """<div class="link tile" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon"><a href="$data.link" data-ajax="false" style="color:white"><i class="fa fa-th"></i></a></div></div>"""
 	} else if (data.tile == "dashboard") {
-		return """<div class="link tile" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon"><a href="$data.link" data-ajax="false" style="color:white"><i class="fa fa-link"></i></a></div></div>"""
+		return """<div class="dashboard tile" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon"><a href="$data.link" data-ajax="false" style="color:white"><i class="fa fa-link"></i></a></div></div>"""
 	} else if (data.tile == "video") {
 		return """<div class="video tile h2 w2" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><param name="movie" value="$data.link"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param><embed src="$data.link" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="240" height="164" wmode="opaque"></embed></object></div></div>"""
 	} else if (data.tile == "genericMJPEGvideo") {
@@ -652,14 +651,14 @@ def renderTile(data) {
 
 def getTileIcons() {
 	[
-		"switch" : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
+		switch : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
 		light : [off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
 		holiday : [off: "<i class='inactive fa fa-tree'></i>", on : "<i class='active fa fa-tree'></i>"],
-		lock : [locked : "<i class='inactive fa fa-lock'></i></div>", unlocked : "<i class='fa fa-unlock-alt'></i>"],
-		motion : [active : "<i class='active fa fa-exchange'></i>", inactive: "<div class='icon'><i class='inactive fa fa-exchange'></i>"],
-		presence : [present : "<i class='active fa fa-map-marker'></i>", notPresent: "<i class='inactive fa fa-map-marker'></i>"],
-		contact : [open : "<i class='active r45 fa fa-expand'>", closed: "<i class='inactive r45 fa fa-compress'></i>"],
-		water : [dry : "<i class='inactive fa fa-tint'></i></div>", wet: "<i class='active fa fa-tint'></i>"],
+		lock : [locked : "<i class='inactive fa fa-lock'></i>", unlocked : "<i class='active fa fa-unlock-alt'></i>"],
+		motion : [active : "<i class='active fa fa-exchange'></i>", inactive: "<i class='inactive opaque fa fa-exchange'></i>"],
+		presence : [present : "<i class='active fa fa-map-marker'></i>", notPresent: "<i class='inactive opaque fa fa-map-marker'></i>"],
+		contact : [open : "<i class='active r45 fa fa-expand'></i>", closed: "<i class='inactive r45 fa fa-compress'></i>"],
+		water : [dry : "<i class='inactive fa fa-tint'></i>", wet: "<i class='active fa fa-tint'></i>"],
 		momentary : "<i class='fa fa-circle-o'></i>",
 		camera : "<i class='fa fa-camera'></i>",
 		refresh : "<i class='fa fa-refresh'></i>",
@@ -667,7 +666,10 @@ def getTileIcons() {
 		temperature : "<i class='fa fa-fw wi wi-thermometer'></i>",
 		energy : "<i class='fa fa-fw wi wi-lightning'></i>",
 		power : "<i class='fa fa-fw fa-bolt'></i>",
-		battery : "<i class='fa fa-fw batt'></i>"
+		battery : "<i class='fa fa-fw batt'></i>",
+        helloHome : "<i class='fa fa-comment-o'></i>",
+        link : "<i class='fa fa-link'></i>",
+        dashboard : "<i class='fa fa-th'></i>",
 	]
 }
 
