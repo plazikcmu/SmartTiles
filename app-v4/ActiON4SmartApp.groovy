@@ -472,6 +472,33 @@ ${readOnlyMode ? """.tile, .music i {cursor: default} .clock, .refresh{cursor: p
 """
 }                                                              
 
+def footer() {
+"""<script>
+$(function() {
+  var wall = new freewall(".tiles");
+  wall.fitWidth();
+  
+  wall.reset({
+			draggable: false,
+			selector: '.tile',
+		animate: true,
+		gutterX:cellGutter,
+		gutterY:cellGutter,
+		cellW:cellSize,
+		cellH:cellSize,
+		fixSize:null,
+		onResize: function() {
+			wall.fitWidth();
+			wall.refresh();
+		}
+	});
+	wall.fitWidth();
+	// for scroll bar appear;
+	$(window).trigger("resize");
+});
+</script>"""
+}
+
 def headList() {
 """
 <meta charset="UTF-8" />
@@ -811,7 +838,7 @@ def allDeviceData() {
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
 }
 
-def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body style='background-color:black'>\n${renderTiles()}\n${renderWTFCloud()}</body></html>"}
+def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body style='background-color:black'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
 def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile(it)}.join("\n")}<div class="blank tile"></div></div>"""}
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}

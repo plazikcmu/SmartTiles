@@ -342,26 +342,3 @@ function checkTime(i) {
 
 var cellSize = getUrlParameter("t") || tileSize;
 var cellGutter = getUrlParameter("g") || 4;
-
-$(function() {
-  var wall = new freewall(".tiles");
-  wall.fitWidth();
-  
-  wall.reset({
-			draggable: false,
-			selector: '.tile',
-		animate: true,
-		gutterX:cellGutter,
-		gutterY:cellGutter,
-		cellW:cellSize,
-		cellH:cellSize,
-		fixSize:null,
-		onResize: function() {
-			wall.fitWidth();
-			wall.refresh();
-		}
-	});
-	wall.fitWidth();
-	// for scroll bar appear;
-	$(window).trigger("resize");
-});
