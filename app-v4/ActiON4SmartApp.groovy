@@ -180,9 +180,10 @@ def preferences() {
 		section("Preferences...") {
 			label title: "Title", required: false, defaultValue: "ActiON4"
 			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
-			input "dropShadow", title: "Drop shadow", "bool", required: true, defaultValue: true
+			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: true
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Small", "Normal", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
+			input "holidayType", title: "Holiday Lights Theme", "enum", multiple: false, required: true, defaultValue: "Christmas", options: ["Christmas", "Valentine's"]
 		}
 		
 		if (state) {
@@ -651,6 +652,7 @@ def renderTile(data) {
 
 def getTileIcons() {
 	[
+		dimmer : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
 		switch : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
 		light : [off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
 		holiday : [off: "<i class='inactive fa fa-tree'></i>", on : "<i class='active fa fa-tree'></i>"],
@@ -670,6 +672,7 @@ def getTileIcons() {
         helloHome : "<i class='fa fa-comment-o'></i>",
         link : "<i class='fa fa-link'></i>",
         dashboard : "<i class='fa fa-th'></i>",
+		holiday: getHolidayIcon()
 	]
 }
 
@@ -677,30 +680,37 @@ def getListIcon(type) {
 	def icons = [
 		clock: """<i class="fa fa-fw fa-clock-o"></i>""",
 		mode: """<i class="fa fa-fw fa-gear"></i>""",
-		"hello-home": """<i class="fa fa-fw fa-comment-o"></i>""",
 		weather: """<i class="fa fa-fw fa-sun-o"></i>""",
-		holiday: """<i class="fa fa-fw fa-tree"></i>""",
-		lock: """<i class="fa fa-fw fa-lock"></i>""",
 		music: """<i class="fa fa-fw fa-music"></i>""",
-		"switch": """<i class="fa fa-fw fa-toggle-on"></i>""",
-		dimmer: """<i class="fa fa-fw fa-toggle-on"></i>""",
-		momentary: """<i class="fa fa-fw fa-circle-o"></i>""",
-		contact: """<i class="fa fa-fw fa-expand"></i>""",
-		presence: """<i class="fa fa-fw fa-map-marker"></i>""",
-		motion: """<i class="fa fa-fw fa-exchange"></i>""",
-		camera: """<i class="fa fa-fw fa-camera"></i>""",
 		video: """<i class="fa fa-fw fa-video-camera"></i>""",
-		temperature: """<i class="fa fa-fw wi wi-thermometer"></i>""",
-		humidity: """<i class="fa fa-fw wi wi-sprinkles"></i>""",
-		water: """<i class="fa fa-fw fa-tint"></i>""",
-		energy: """<i class="fa fa-fw wi wi-lightning"></i>""",
-		power: """<i class="fa fa-fw fa-bolt"></i>""",
-		battery: """<i class="fa fa-fw batt"></i>""",
-		link: """<i class="fa fa-fw fa-link"></i>""",
-		refresh: """<i class="fa fa-fw fa-refresh"></i>""",
+		"hello-home": getTileIcons().helloHome,
+		lock: getTileIcons().lock.locked,
+		switch: getTileIcons().switch.on,
+		light: getTileIcons().light.on,
+		holiday: getTileIcons().holiday.on,
+		dimmer: getTileIcons().dimmer.on,
+		momentary: getTileIcons().momentary,
+		contact: getTileIcons().contact.open,
+		presence: getTileIcons().presence.present,
+		motion: getTileIcons().motion.active,
+		camera: getTileIcons().camera,
+		temperature: getTileIcons().temperature,
+		humidity: getTileIcons().humidity,
+		water: getTileIcons().humidity,
+		energy: getTileIcons().energy,
+		power: getTileIcons().power,
+		battery: getTileIcons().battery,
+		link: getTileIcons().link,
+		dashboard: getTileIcons().dashboard,
+		refresh: getTileIcons().refresh,
 	]
 	
 	icons[type]
+}
+
+def getHolidayIcon() {
+	if (holidayType == "Valentine's") return [on : """<i class="fa fa-fw fa-heart"></i>""", off : """<i class="fa fa-fw fa-heart-o"></i>"""]
+	[on: """<i class="fa fa-fw fa-tree"></i>""", off: """<i class="fa fa-fw fa-tree"></i>"""]
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}

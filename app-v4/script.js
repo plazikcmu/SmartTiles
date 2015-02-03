@@ -120,7 +120,8 @@ function spinner(element) {
 }
 
 function setIcons() {
-	$(".switch, .dimmer").append("<div class='icon'>" + icons.switch.on + icons.switch.off + "'></i></div>");
+	$(".switch").append("<div class='icon'>" + icons.switch.on + icons.switch.off + "'></i></div>");
+	$(".dimmer").append("<div class='icon'>" + icons.dimmer.on + icons.dimmer.off + "'></i></div>");
 	$(".light").append("<div class='icon'>" + icons.light.on + icons.light.off + "'></i></div>");
 	$(".holiday").append("<div class='icon'>" + icons.holiday.active + icons.holiday.inactive + "</div>");
 	$(".lock").append("<div class='icon'>" + icons.lock.locked + icons.lock.unlocked + "</div>");
