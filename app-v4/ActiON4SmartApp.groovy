@@ -379,10 +379,12 @@ def initialize() {
 	subscribe(location, handler)
 	subscribe(holiday, "switch.on", handler, [filterEvents: false])
 	subscribe(holiday, "switch.off", handler, [filterEvents: false])
-	subscribe(lights, "switch.on", handler, [filterEvents: false])
-	subscribe(lights, "switch.off", handler, [filterEvents: false])
 	subscribe(holiday, "switch", handler, [filterEvents: false])
 	subscribe(holiday, "level", handler, [filterEvents: false])
+	subscribe(lights, "switch.on", handler, [filterEvents: false])
+	subscribe(lights, "switch.off", handler, [filterEvents: false])
+	subscribe(lights, "switch", handler, [filterEvents: false])
+	subscribe(lights, "level", handler, [filterEvents: false])
     subscribe(switches, "switch", handler, [filterEvents: false])
     subscribe(dimmers, "level", handler, [filterEvents: false])
 	subscribe(dimmers, "switch", handler, [filterEvents: false])
@@ -748,7 +750,7 @@ def getListIcon(type) {
 
 def getHolidayIcon() {
 	if (holidayType == "Valentine's") return [on : """<i class="active fa fa-fw fa-heart"></i>""", off : """<i class="inactive fa fa-fw fa-heart-o"></i>"""]
-	else if (holidayType == "Christmas") return [on: """<i class="active fa fa-fw fa-tree"></i>""", off: """<i class="inactive fa fa-fw fa-tree"></i>"""]
+	else if (holidayType == "Christmas") return [on: """<i class="active fa fa-fw fa-tree"></i>""", off: """<i class="inactive fa fa-fw fa-tree"></i>""", css: """ """]
     
     [off : "<i class='inactive opaque fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"]
 }
@@ -761,7 +763,7 @@ def getDeviceData(device, type) {[tile: "device",  active: isActive(device, type
 
 def getDeviceFieldMap() {[lock: "lock", holiday: "switch", light: "switch", "switch": "switch", dimmer: "switch", contact: "contact", presence: "presence", temperature: "temperature", humidity: "humidity", motion: "motion", water: "water", power: "power", energy: "energy", battery: "battery"]}
 
-def getActiveDeviceMap() {[lock: "unlocked", holiday: "on", "switch": "on", dimmer: "on", contact: "open", presence: "present", motion: "active", water: "wet"]}
+def getActiveDeviceMap() {[lock: "unlocked", holiday: "on", light: "on", "switch": "on", dimmer: "on", contact: "open", presence: "present", motion: "active", water: "wet"]}
 
 def isValue(device, type) {!(["momentary", "camera"] << getActiveDeviceMap().keySet()).flatten().contains(type)}
 
