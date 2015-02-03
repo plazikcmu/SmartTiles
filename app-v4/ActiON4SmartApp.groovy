@@ -68,6 +68,7 @@ def controlThings() {
 	dynamicPage(name: "controlThings", title: "Things", install: false) {
 		section("Control these things...") {
 			input "holiday", "capability.switch", title: "Which Holiday Lights?", multiple: true, required: false
+			input "lights", "capability.switch", title: "Which Lights?", multiple: true, required: false
 			input "switches", "capability.switch", title: "Which Switches?", multiple: true, required: false
 			input "dimmers", "capability.switchLevel", title: "Which Dimmers?", multiple: true, required: false
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
@@ -287,6 +288,15 @@ def command() {
 				device.on()
 			}
 		}
+	} else if (type == "light") {
+		device = lights?.find{it.id == id}
+		if (device) {
+			if(device.currentValue('switch') == "on") {
+				device.off()
+			} else {
+				device.on()
+			}
+		}
 	} else if (type == "holiday") {
 		device = holiday?.find{it.id == id}
 		if (device) {
@@ -369,6 +379,8 @@ def initialize() {
 	subscribe(location, handler)
 	subscribe(holiday, "switch.on", handler, [filterEvents: false])
 	subscribe(holiday, "switch.off", handler, [filterEvents: false])
+	subscribe(lights, "switch.on", handler, [filterEvents: false])
+	subscribe(lights, "switch.off", handler, [filterEvents: false])
 	subscribe(holiday, "switch", handler, [filterEvents: false])
 	subscribe(holiday, "level", handler, [filterEvents: false])
     subscribe(switches, "switch", handler, [filterEvents: false])
@@ -681,7 +693,7 @@ def getTileIcons() {
 	[
 		dimmer : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
 		switch : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
-		light : [off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
+		light : [off : "<i class='inactive opaque fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
 		lock : [locked : "<i class='inactive fa fa-lock'></i>", unlocked : "<i class='active fa fa-unlock-alt'></i>"],
 		motion : [active : "<i class='active fa fa-exchange'></i>", inactive: "<i class='inactive opaque fa fa-exchange'></i>"],
 		presence : [present : "<i class='active fa fa-map-marker'></i>", notPresent: "<i class='inactive opaque fa fa-map-marker'></i>"],
@@ -735,9 +747,10 @@ def getListIcon(type) {
 }
 
 def getHolidayIcon() {
-	if (holidayType == "Valentine's") return [on : """<i class="fa fa-fw fa-heart"></i>""", off : """<i class="fa fa-fw fa-heart-o"></i>"""]
-	else if (holidayType == "Christmas") return [on: """<i class="fa fa-fw fa-tree"></i>""", off: """<i class="fa fa-fw fa-tree"></i>"""]
-	[off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
+	if (holidayType == "Valentine's") return [on : """<i class="active fa fa-fw fa-heart"></i>""", off : """<i class="inactive fa fa-fw fa-heart-o"></i>"""]
+	else if (holidayType == "Christmas") return [on: """<i class="active fa fa-fw fa-tree"></i>""", off: """<i class="inactive fa fa-fw fa-tree"></i>"""]
+    
+    [off : "<i class='inactive opaque fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"]
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
@@ -746,7 +759,7 @@ def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.i
 
 def getDeviceData(device, type) {[tile: "device",  active: isActive(device, type), type: type, device: device.id, name: device.displayName, value: getDeviceValue(device, type), level: getDeviceLevel(device, type), isValue: isValue(device, type)]}
 
-def getDeviceFieldMap() {[lock: "lock", holiday: "switch", "switch": "switch", dimmer: "switch", contact: "contact", presence: "presence", temperature: "temperature", humidity: "humidity", motion: "motion", water: "water", power: "power", energy: "energy", battery: "battery"]}
+def getDeviceFieldMap() {[lock: "lock", holiday: "switch", light: "switch", "switch": "switch", dimmer: "switch", contact: "contact", presence: "presence", temperature: "temperature", humidity: "humidity", motion: "motion", water: "water", power: "power", energy: "energy", battery: "battery"]}
 
 def getActiveDeviceMap() {[lock: "unlocked", holiday: "on", "switch": "on", dimmer: "on", contact: "open", presence: "present", motion: "active", water: "wet"]}
 
@@ -812,6 +825,7 @@ def allDeviceData() {
 	weather?.each{data << getWeatherData(it)}
 	
 	holiday?.each{data << getDeviceData(it, "holiday")}
+	lights?.each{data << getDeviceData(it, "light")}
 	locks?.each{data << getDeviceData(it, "lock")}
 	music?.each{data << getMusicPlayerData(it)}
 	switches?.each{data << getDeviceData(it, "switch")}
