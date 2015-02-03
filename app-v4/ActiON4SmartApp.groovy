@@ -474,7 +474,7 @@ ${readOnlyMode ? """.tile, .music i {cursor: default} .clock, .refresh{cursor: p
 
 def footer() {
 """<script>
-$(function() {
+\$(function() {
   var wall = new freewall(".tiles");
   wall.fitWidth();
   
@@ -494,7 +494,7 @@ $(function() {
 	});
 	wall.fitWidth();
 	// for scroll bar appear;
-	$(window).trigger("resize");
+	\$(window).trigger("resize");
 });
 </script>"""
 }
@@ -682,7 +682,6 @@ def getTileIcons() {
 		dimmer : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
 		switch : [off : "<i class='inactive fa fa-toggle-off'></i>", on : "<i class='active fa fa-toggle-on'></i>"],
 		light : [off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
-		holiday : [off: "<i class='inactive fa fa-tree'></i>", on : "<i class='active fa fa-tree'></i>"],
 		lock : [locked : "<i class='inactive fa fa-lock'></i>", unlocked : "<i class='active fa fa-unlock-alt'></i>"],
 		motion : [active : "<i class='active fa fa-exchange'></i>", inactive: "<i class='inactive opaque fa fa-exchange'></i>"],
 		presence : [present : "<i class='active fa fa-map-marker'></i>", notPresent: "<i class='inactive opaque fa fa-map-marker'></i>"],
@@ -737,7 +736,8 @@ def getListIcon(type) {
 
 def getHolidayIcon() {
 	if (holidayType == "Valentine's") return [on : """<i class="fa fa-fw fa-heart"></i>""", off : """<i class="fa fa-fw fa-heart-o"></i>"""]
-	[on: """<i class="fa fa-fw fa-tree"></i>""", off: """<i class="fa fa-fw fa-tree"></i>"""]
+	else if (holidayType == "Christmas") return [on: """<i class="fa fa-fw fa-tree"></i>""", off: """<i class="fa fa-fw fa-tree"></i>"""]
+	[off : "<i class='inactive fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"],
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
