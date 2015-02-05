@@ -1,5 +1,5 @@
 /**
- *  ActiON Dashboard 4.5
+ *  ActiON Dashboard 4.6.0
  *
  *  Visit Home Page for more information:
  *  http://action-dashboard.github.io/
@@ -12,7 +12,7 @@
  *
  */
 definition(
-    name: "ActiON4.5",
+    name: "ActiON4.6.0",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
@@ -27,7 +27,7 @@ preferences {
     
         section("About") {
             paragraph "ActiON Dashboard, a SmartThings web client."
-            paragraph "Version 4.5\n\n" +
+            paragraph "Version 4.6.0\n\n" +
             "If you like this app, please support the developer via PayPal:\nalex.smart.things@gmail.com\n\n" +
             "Copyright © 2014 Alex Malikov"
 			href url:"http://action-dashboard.github.io", style:"embedded", required:false, title:"More information...", description:"http://action-dashboard.github.io"
@@ -474,7 +474,6 @@ var smartAppVersion = "4.6";
 <script src="https://625alex.github.io/ActiON-Dashboard/freewall.js?v=6" type="text/javascript"></script>
 <script src="https://625alex.github.io/ActiON-Dashboard/script.tmp.js?v=6" type="text/javascript"></script>
 
-
 <style>
 .tile {width: ${getTSize()}px; height: ${getTSize()}px;}
 .w2 {width: ${getTSize() * 2}px;}
@@ -482,6 +481,7 @@ var smartAppVersion = "4.6";
 ${!dropShadow ? ".icon, .icon * {text-shadow: none;} .ui-slider-handle.ui-btn.ui-shadow {box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;}" : ""}
 body {font-size: ${getFSize()}%;}
 ${readOnlyMode ? """.tile, .music i {cursor: default} .clock, .refresh{cursor: pointer}""" : ""}
+${getHolidayIcon().css}
 </style>
 """
 }                                                              
@@ -749,10 +749,13 @@ def getListIcon(type) {
 }
 
 def getHolidayIcon() {
-	if (holidayType == "Valentine's") return [on : """<i class="active fa fa-fw fa-heart"></i>""", off : """<i class="inactive fa fa-fw fa-heart-o"></i>"""]
-	else if (holidayType == "Christmas") return [on: """<i class="active fa fa-fw fa-tree"></i>""", off: """<i class="inactive fa fa-fw fa-tree"></i>""", css: """ """]
-    
-    [off : "<i class='inactive opaque fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>"]
+	def map = [
+	"Valentine's" : [on : """<i class="active fa fa-fw fa-heart"></i>""", off : """<i class="inactive fa fa-fw fa-heart-o"></i>""", css: """.holiday {background-color: #FF82B2;} /*pink*/ .holiday.active {background-color: #A90000} .holiday.active .icon i {color:#EA001F}"""],
+	"Christmas" : [on: """<i class="active fa fa-fw fa-tree"></i>""", off: """<i class="inactive fa fa-fw fa-tree"></i>""", css: """.holiday {background-color: #11772D;} /*green*/ .holiday.active {background-color: #AB0F0B} .holiday.active .icon i {color:#11772D}"""],
+	null : [off : "<i class='inactive opaque fa fa-lightbulb-o'></i>", on : "<i class='active fa fa-lightbulb-o'></i>", css : "/*n/a*/"]
+    ]
+	
+	map[holidayType]
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
@@ -867,9 +870,9 @@ def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head
 def customCSS() {
 """
 <style>
-/*** Enter custom CSS here ***/
+/*** Custonm CSS Start ***/
 
-/*****************************/
+/*** Custonm CSS End *****/
 </style>
 """
 }
