@@ -1,4 +1,4 @@
-var scriptVersion = "4.6";
+var scriptVersion = "4.6.3";
 
 $(function() {
 	
@@ -14,25 +14,36 @@ $(function() {
 	
 	if (readOnlyMode) {return false;}
 	
-	$(".switch, .dimmer, .momentary, .clock, .lock, .link, .holiday, .camera, .music i").click(function() {
+	$(".switch, .dimmer, .momentary, .clock, .lock, .link, .holiday, .camera, .music i, .light, .dimmerLight").click(function() {
 		animateClick($(this));
 	});
 	
-	$(".switch, .lock, .momentary, .holiday, .camera").click(function() {
+	$(".dashboard").click(function(e) {
+		animateClick($(this));
+		e.stopImmediatePropagation();
+		$(".refresh .icon").addClass("fa-spin");
+		window.location = $(this).find("a").attr("href");
+	});
+	
+	$(".dashboard a").click(function(e) {
+		alert("at a");
+	}
+	
+	$(".switch, .light, .lock, .momentary, .holiday, .camera").click(function() {
 		$(this).closest(".tile").toggleClass("active");
         sendCommand($(this).attr("data-type"), $(this).attr("data-device"), "toggle");
 	});
 	
-	$(".dimmer").click(function() {
+	$(".dimmer, .dimmerLight").click(function() {
 		$(this).toggleClass("active");
-    	sendCommand("dimmer", $(this).attr("data-device"), "toggle", $(this).attr("data-level"));
+    	sendCommand($(this).attr("data-type"), $(this).attr("data-device"), "toggle", $(this).attr("data-level"));
     });
 	
-    $(".dimmer").on('slidestop', function(e) {
+    $(".dimmer, .dimmerLight").on('slidestop', function(e) {
     	var level = $(this).find("input").val()
 		if ($(this).hasClass("active")) {
 			animateClick($(this));
-			sendCommand("dimmer", $(this).attr("data-device"), "level", level);
+			sendCommand($(this).attr("data-type"), $(this).attr("data-device"), "level", level);
 		};
 		$(this).attr("data-level", level);
     });
@@ -120,9 +131,10 @@ function spinner(element) {
 }
 
 function setIcons() {
-	$(".switch").append("<div class='icon'>" + icons.switch.on + icons.switch.off + "'></i></div>");
-	$(".dimmer").append("<div class='icon'>" + icons.dimmer.on + icons.dimmer.off + "'></i></div>");
-	$(".light").append("<div class='icon'>" + icons.light.on + icons.light.off + "'></i></div>");
+	$(".switch").append("<div class='icon'>" + icons.switch.on + icons.switch.off + "</div>");
+	$(".dimmer").append("<div class='icon'>" + icons.dimmer.on + icons.dimmer.off + "</div>");
+	$(".light").append("<div class='icon'>" + icons.light.on + icons.light.off + "</div>");
+	$(".dimmerLight").append("<div class='icon'>" + icons.light.on + icons.light.off + "</div>");
 	$(".holiday").append("<div class='icon'>" + icons.holiday.on + icons.holiday.off + "</div>");
 	$(".lock").append("<div class='icon'>" + icons.lock.locked + icons.lock.unlocked + "</div>");
 	$(".motion").append("<div class='icon'>" + icons.motion.active + icons.motion.inactive + "</div>");
@@ -130,17 +142,22 @@ function setIcons() {
 	$(".contact").append("<div class='icon'>" + icons.contact.open + icons.contact.closed + "</div>");
 	$(".water").append("<div class='icon'>" + icons.water.dry + icons.water.wet + "</div>");
 
-	$(".dimmer, .music").each(function(){renderSlider($(this))});
+	$(".dimmer, .dimmerLight, .music").each(function(){renderSlider($(this))});
 	$(".weather").each(function(){renderWeather($(this))});
 	
 	$(".momentary").append("<div class='icon'>" + icons.momentary + "</div>");
 	$(".camera").append("<div class='icon'>" + icons.camera + "</div>");
 	$(".refresh").append("<div class='icon'>" + icons.refresh + "</div>");
+	$(".hello-home").append("<div class='icon'>" + icons.helloHome + "</div>");
+	
 	$(".humidity").append("<div class='footer'>" + icons.humidity + "</div>");
 	$(".temperature").append("<div class='footer'>" + icons.temperature + "</div>");
 	$(".energy").append("<div class='footer'>" + icons.energy + "</div>");
 	$(".power").append("<div class='footer'>" + icons.power + "</div>");
 	$(".battery").append("<div class='footer'>" + icons.battery + "</div>");
+	
+	$(".link").find("a").html(icons.link);
+	$(".dashboard").find("a").html(icons.dashboard);
 	
 	$(".tile[data-is-value=true]").each(function(){renderValue($(this))});
 }
@@ -232,7 +249,7 @@ function updateTile(data) {
 				tile.attr("data-active", data.active);
 			}
 			
-			if (data.type == "dimmer" || data.type == "music") {
+			if (data.type == "dimmer" || data.type == "dimmerLight" || data.type == "music") {
 				if (data.level != tile.attr("data-level")) spinner(tile);
 				tile.attr("data-level", data.level);
 				renderSlider(tile);
