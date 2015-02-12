@@ -74,13 +74,16 @@ preferences {
 
 def controlThings() {
 	dynamicPage(name: "controlThings", title: "Things", install: false) {
-		section("Control these things...") {
-			input "holiday", "capability.switch", title: "Which Holiday Lights?", multiple: true, required: false
+		section("Control these lights...") {
 			input "lights", "capability.switch", title: "Which Lights?", multiple: true, required: false
-			input "dimmerLights", "capability.switchLevel", title: "Which Dimmable Lights?", multiple: true, required: false
 			input "switches", "capability.switch", title: "Which Switches?", multiple: true, required: false
+			input "dimmerLights", "capability.switchLevel", title: "Which Dimmable Lights?", multiple: true, required: false
 			input "dimmers", "capability.switchLevel", title: "Which Dimmers?", multiple: true, required: false
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
+			input "holiday", "capability.switch", title: "Which Holiday Lights?", multiple: true, required: false
+		}
+		
+		section("Control these things...") {
 			input "locks", "capability.lock", title: "Which Locks?", multiple: true, required: false
 			input "camera", "capability.imageCapture", title: "Which Cameras?", multiple: true, required: false
 			input "music", "capability.musicPlayer", title: "Which Music Players?", multiple: true, required: false
@@ -309,7 +312,7 @@ def command() {
 		}
 	} else if (type == "dimmer" || type == "dimmerLight") {
 		def deviceSet = (type == "dimmer" ? dimmers : dimmerLights)
-		device = dimmers?.find{it.id == id}
+		device = deviceSet?.find{it.id == id}
 		if (device) {
 			if (command == "toggle") {
 				if(device.currentValue('switch') == "on") {
@@ -452,7 +455,7 @@ def head() {
 <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
-<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.4.6.0.min.css?u=0" rel="stylesheet">
+<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.4.6.3.min.css?u=0" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 
 <script>
@@ -465,7 +468,7 @@ var smartAppVersion = "4.6.3";
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
-<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.4.6.0.min.js?u=0" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.4.6.3.min.js?u=0" type="text/javascript"></script>
 
 <style>
 .tile {width: ${getTSize()}px; height: ${getTSize()}px;}
@@ -654,7 +657,7 @@ def renderTile(data) {
 		return """
 		<div class="music tile w2 $data.active ${data.mute ? "muted" : ""}" data-type="music" data-device="$data.device" data-level="$data.level" data-track-description="$data.trackDescription" data-mute="$data.mute">
 			<div class="title"><span class="name">$data.name</span><br/><span class='title2 track'>$data.trackDescription</span></div>
-			<div class="icon text"><i class="fa fa-fw fa-backward back"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-fw fa-pause pause"></i><i class="fa fa-fw fa-play play"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-fw fa-forward forward"></i></div>
+			<div class="icon text"><i class="fa fa-fw fa-backward back"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-fw fa-pause pause"></i><i class="fa fa-fw fa-play play"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-fw fa-forward forward"></i></div>
 			<div class="footer"><i class='fa fa-fw fa-volume-down unmuted'></i><i class='fa fa-fw fa-volume-off muted'></i></div>
 		</div>
 		"""
