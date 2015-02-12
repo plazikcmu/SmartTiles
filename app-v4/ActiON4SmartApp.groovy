@@ -77,7 +77,7 @@ def controlThings() {
 		section("Control these things...") {
 			input "holiday", "capability.switch", title: "Which Holiday Lights?", multiple: true, required: false
 			input "lights", "capability.switch", title: "Which Lights?", multiple: true, required: false
-			input "dimmerLights", "capability.switch", title: "Which Dimmable Lights?", multiple: true, required: false
+			input "dimmerLights", "capability.switchLevel", title: "Which Dimmable Lights?", multiple: true, required: false
 			input "switches", "capability.switch", title: "Which Switches?", multiple: true, required: false
 			input "dimmers", "capability.switchLevel", title: "Which Dimmers?", multiple: true, required: false
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
@@ -307,7 +307,7 @@ def command() {
                 device.lock()
             }
 		}
-	} else if (type == "dimmer" || type == "dimmerLights") {
+	} else if (type == "dimmer" || type == "dimmerLight") {
 		def deviceSet = (type == "dimmer" ? dimmers : dimmerLights)
 		device = dimmers?.find{it.id == id}
 		if (device) {
@@ -761,7 +761,7 @@ def getDeviceData(device, type) {[tile: "device",  active: isActive(device, type
 
 def getDeviceFieldMap() {[lock: "lock", holiday: "switch", light: "switch", "switch": "switch", dimmer: "switch", dimmerLight: "switch", contact: "contact", presence: "presence", temperature: "temperature", humidity: "humidity", motion: "motion", water: "water", power: "power", energy: "energy", battery: "battery"]}
 
-def getActiveDeviceMap() {[lock: "unlocked", holiday: "on", light: "on", "switch": "on", dimmer: "on", dimmerLights: "on", contact: "open", presence: "present", motion: "active", water: "wet"]}
+def getActiveDeviceMap() {[lock: "unlocked", holiday: "on", light: "on", "switch": "on", dimmer: "on", dimmerLight: "on", contact: "open", presence: "present", motion: "active", water: "wet"]}
 
 def isValue(device, type) {!(["momentary", "camera"] << getActiveDeviceMap().keySet()).flatten().contains(type)}
 
@@ -829,7 +829,7 @@ def allDeviceData() {
 	lights?.each{data << getDeviceData(it, "light")}
 	holiday?.each{data << getDeviceData(it, "holiday")}
 	dimmers?.each{data << getDeviceData(it, "dimmer")}
-	dimmerLights?.each{data << getDeviceData(it, "dimmerLights")}
+	dimmerLights?.each{data << getDeviceData(it, "dimmerLight")}
 	momentaries?.each{data << getDeviceData(it, "momentary")}
 	contacts?.each{data << getDeviceData(it, "contact")}
 	presence?.each{data << getDeviceData(it, "presence")}
