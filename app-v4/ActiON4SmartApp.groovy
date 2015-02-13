@@ -477,7 +477,7 @@ var smartAppVersion = "4.6.3";
 ${!dropShadow ? ".icon, .icon * {text-shadow: none;} .ui-slider-handle.ui-btn.ui-shadow {box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;}" : ""}
 body {font-size: ${getFSize()}%;}
 ${readOnlyMode ? """.tile, .music i {cursor: default} .clock, .refresh{cursor: pointer}""" : ""}
-${getHolidayIcon().css}
+${getThemeLightIcon().css}
 </style>
 """
 }                                                              
@@ -568,7 +568,7 @@ ul{list-style-type: none;padding-left:0;}
 .item {cursor:grab; padding:5px; margin:8px;border-radius:2px}
 .list {width: 75%; margin: 0 auto 60px auto;}
 .list i {margin-right:5px;}
-${getHolidayIcon().css}
+${getThemeLightIcon().css}
 </style>
 """
 }  
@@ -710,7 +710,7 @@ def getTileIcons() {
         helloHome : "<i class='fa fa-fw fa-comment-o'></i>",
         link : "<i class='fa fa-fw fa-link'></i>",
         dashboard : "<i class='fa fa-fw fa-th'></i>",
-		holiday: getHolidayIcon()
+		themeLight: getThemeLightIcon()
 	]
 }
 
@@ -725,7 +725,7 @@ def getListIcon(type) {
 		lock: getTileIcons().lock.locked,
 		switch: getTileIcons().switch.on,
 		light: getTileIcons().light.on,
-		holiday: getTileIcons().holiday.on,
+		themeLight: getTileIcons().themeLight.on,
 		dimmer: getTileIcons().dimmer.on,
 		dimmerLight: getTileIcons().dimmerLight.on,
 		momentary: getTileIcons().momentary,
@@ -747,13 +747,12 @@ def getListIcon(type) {
 	icons[type]
 }
 
-def getHolidayIcon() {
+def getThemeLightIcon() {
 	def icons = [
 	"Valentine's Day" : [on : "<i class='active fa fa-fw fa-heart'></i>", off : "<i class='inactive fa fa-fw fa-heart-o'></i>", css: ".themeLight {background-color: #FF82B2;} /*pink*/ .themeLight.active {background-color: #A90000} .themeLight.active .icon i {color:#EA001F}"],
 	"Christmas" : [on: "<i class='active fa fa-fw fa-tree'></i>", off: "<i class='inactive fa fa-fw fa-tree'></i>", css: ".themeLight {background-color: #11772D;} /*green*/ .themeLight.active {background-color: #AB0F0B} .themeLight.active .icon i {color:#11772D}"],
-	"Default" : [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>", css : ""]
     ]
-	icons[holidayType ?: "Default"]
+	icons[holidayType] ?: [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>", css : ""]
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
