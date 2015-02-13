@@ -56,7 +56,6 @@ preferences {
 		}
 		
 		section("More Tiles and Preferences...") {
-			href "moreTiles", title:"Clock, Mode, Hello Home!"
 			href "preferences", title: "Preferences"
 		}
     }
@@ -66,7 +65,6 @@ preferences {
 	page(name: "videoStreamsMJPEG", title: "videoStreamsMJPEG")
 	page(name: "dashboards", title: "dashboards")
 	page(name: "links", title: "links")
-	page(name: "moreTiles", title: "moreTiles")
 	page(name: "preferences", title: "preferences")
 	page(name: "authenticationPreferences", title: "authenticationPreferences")
 	page(name: "viewURL", title: "viewURL")
@@ -78,7 +76,7 @@ def controlThings() {
 			input "lights", "capability.switch", title: "Which Lights?", multiple: true, required: false
 			input "switches", "capability.switch", title: "Which Switches?", multiple: true, required: false
 			input "dimmerLights", "capability.switchLevel", title: "Which Dimmable Lights?", multiple: true, required: false
-			input "dimmers", "capability.switchLevel", title: "Which Dimmers?", multiple: true, required: false
+			input "dimmers", "capability.switchLevel", title: "Which Dimmable Switches?", multiple: true, required: false
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
 			input "holiday", "capability.switch", title: "Which Theme Lights?", multiple: true, required: false
 		}
@@ -178,18 +176,8 @@ def dashboards() {
 	}
 }
 
-def moreTiles() {
-	dynamicPage(name: "moreTiles", title: "More Tiles...", install: false) {
-		section() {
-			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
-			input "showHelloHome", title: "Hello, Home! Actions", "bool", required: true, defaultValue: true
-			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
-		}
-	}
-}
-
 def preferences() {
-	dynamicPage(name: "preferences", title: "Preferences...", install: false) {
+	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section("Preferences...") {
 			label title: "Title", required: false, defaultValue: "ActiON4"
 			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
@@ -197,6 +185,12 @@ def preferences() {
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Small", "Normal", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
 			input "holidayType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
+		}
+		
+		section("More Tiles...") {
+			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
+			input "showHelloHome", title: "Hello, Home! Actions", "bool", required: true, defaultValue: true
+			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
 		}
 		
 		if (state) {
