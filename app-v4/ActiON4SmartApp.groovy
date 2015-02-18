@@ -1,5 +1,5 @@
 /**
- *  ActiON Dashboard 4.6.3
+ *  ActiON Dashboard 5.0
  *
  *  Visit Home Page for more information:
  *  http://action-dashboard.github.io/
@@ -20,7 +20,7 @@
  *
  */
 definition(
-    name: "ActiON4.6.3",
+    name: "ActiON5.0",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
@@ -35,7 +35,7 @@ preferences {
     
         section("About") {
             paragraph "ActiON Dashboard, a SmartThings web client.\n\nYour home has a Home Page!™"
-            paragraph "Version 4.6.3\n\n" +
+            paragraph "Version 5.0\n\n" +
             "If you like this app, please support the developer via PayPal:\n\nalex.smart.things@gmail.com\n\n" +
             "Copyright © 2014 Alex Malikov"
 			href url:"http://action-dashboard.github.io", style:"embedded", required:false, title:"More information...", description:"http://action-dashboard.github.io"
@@ -80,7 +80,9 @@ def controlThings() {
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
 			input "holiday", "capability.switch", title: "Which Theme Lights?", multiple: true, required: false
 		}
-		
+		section("Control these thermostats...") {
+			input "thermostatsHeat", "capability.thermostat", title: "Which Heating Thermostats?", multiple: true, required: false
+		}
 		section("Control these things...") {
 			input "locks", "capability.lock", title: "Which Locks?", multiple: true, required: false
 			input "camera", "capability.imageCapture", title: "Which Cameras?", multiple: true, required: false
@@ -395,6 +397,8 @@ def initialize() {
 	subscribe(music, "level", handler, [filterEvents: false])
 	subscribe(music, "trackDescription", handler, [filterEvents: false])
 	subscribe(music, "mute", handler, [filterEvents: false])
+	
+	subscribe(thermostatsHeat, "thermostat", handler, [filterEvents: false])
 }
 
 def sendURL_SMS(path) {
@@ -449,7 +453,7 @@ def head() {
 <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
-<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.4.6.3.min.css?u=0" rel="stylesheet">
+<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.5.0.min.css?u=0" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 
 <script>
@@ -457,12 +461,12 @@ var stateTS = ${getStateTS()};
 var tileSize = ${getTSize()};
 var readOnlyMode = ${readOnlyMode ?: false};
 var icons = ${getTileIcons().encodeAsJSON()};
-var smartAppVersion = "4.6.3";
+var smartAppVersion = "5.0";
 </script>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
-<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.4.6.3.min.js?u=0" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.5.0.min.js?u=0" type="text/javascript"></script>
 
 <style>
 .tile {width: ${getTSize()}px; height: ${getTSize()}px;}
@@ -597,6 +601,10 @@ def getDOW() {
     "${tf.format(new Date())}"
 }
 
+def renderThermostat(data) {
+"""<div class="tile thermostat h2" data-data=""></div>""" 
+}
+
 def renderModeTile(data) {
 """<div class="mode tile w2 menu ${data.isStandardMode ? data.mode : ""}" data-mode="$data.mode" data-popup="mode-popup">
 	<div class="title">Mode</div>
@@ -642,8 +650,18 @@ def getWeatherData(device) {
 	data
 }
 
+def getThermostatData(device) {
+	def data = [tile: "device", type: "thermostatHeat", device: device.id, name: device.displayName]
+	device?.supportedAttributes?.each{data << ["$it": sensor.currentValue("$it")]}
+	data
+}
+
 def renderTile(data) {
-	if (data.type == "weather"){
+	if (data.type == "thermostat") {
+		def name = data.name
+		data.remove("name")
+		return """<div class="thermostat tile h2" data-type="thermostat" data-device="$data.device" data-data='${data.encodeAsJSON()}'></div>"""
+	} else if (data.type == "weather"){
 		def city = data.city
 		data.remove("city")
 		return """<div class="weather tile w2" data-type="weather" data-device="$data.device" data-city="$city" data-weather='${data.encodeAsJSON()}'></div>"""
@@ -820,6 +838,7 @@ def allDeviceData() {
 	weather?.each{data << getWeatherData(it)}
 	
 	locks?.each{data << getDeviceData(it, "lock")}
+	thermostatsHeat?.each{data << getThermostatData(it)}
 	music?.each{data << getMusicPlayerData(it)}
 	switches?.each{data << getDeviceData(it, "switch")}
 	lights?.each{data << getDeviceData(it, "light")}
