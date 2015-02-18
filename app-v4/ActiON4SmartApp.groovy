@@ -80,9 +80,12 @@ def controlThings() {
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
 			input "holiday", "capability.switch", title: "Which Theme Lights?", multiple: true, required: false
 		}
+		
 		section("Control these thermostats...") {
 			input "thermostatsHeat", "capability.thermostat", title: "Which Heating Thermostats?", multiple: true, required: false
+			input "thermostatsCool", "capability.thermostat", title: "Which Cooling Thermostats?", multiple: true, required: false
 		}
+		
 		section("Control these things...") {
 			input "locks", "capability.lock", title: "Which Locks?", multiple: true, required: false
 			input "camera", "capability.imageCapture", title: "Which Cameras?", multiple: true, required: false
@@ -453,7 +456,7 @@ def head() {
 <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
-<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.5.0.min.css?u=0" rel="stylesheet">
+<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.5.0.0.min.css?u=0" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 
 <script>
@@ -466,7 +469,7 @@ var smartAppVersion = "5.0";
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
-<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.5.0.min.js?u=0" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.5.0.0.min.js?u=0" type="text/javascript"></script>
 
 <style>
 .tile {width: ${getTSize()}px; height: ${getTSize()}px;}
@@ -650,17 +653,25 @@ def getWeatherData(device) {
 	data
 }
 
-def getThermostatData(device) {
-	def data = [tile: "device", type: "thermostatHeat", device: device.id, name: device.displayName]
-	device?.supportedAttributes?.each{data << ["$it": sensor.currentValue("$it")]}
+def getThermostatData(device, type) {
+	def data = [tile: "device", type: type, device: device.id, name: device.displayName]
+	device?.supportedAttributes?.each{
+		try {
+			data << ["$it": device.currentValue("$it")]
+		} catch (e) {
+			data << ["$it": "n/a"]
+			log.error e
+			log.debug "$device has trouble reporting $it. Is value not set when integer is expected?"
+		}
+	}
 	data
 }
 
 def renderTile(data) {
-	if (data.type == "thermostat") {
+	if (data.type == "thermostatHeat") {
 		def name = data.name
 		data.remove("name")
-		return """<div class="thermostat tile h2" data-type="thermostat" data-device="$data.device" data-data='${data.encodeAsJSON()}'></div>"""
+		return """<div class="$data.thermostatType tile h2" data-name="$name" data-type="$data.thermostatType" data-device="$data.device" data-data='${data.encodeAsJSON()}'></div>"""
 	} else if (data.type == "weather"){
 		def city = data.city
 		data.remove("city")
@@ -838,7 +849,8 @@ def allDeviceData() {
 	weather?.each{data << getWeatherData(it)}
 	
 	locks?.each{data << getDeviceData(it, "lock")}
-	thermostatsHeat?.each{data << getThermostatData(it)}
+	thermostatsHeat?.each{data << getThermostatData(it, "thermostatHeat")}
+	thermostatsCool?.each{data << getThermostatData(it, "thermostatCool")}
 	music?.each{data << getMusicPlayerData(it)}
 	switches?.each{data << getDeviceData(it, "switch")}
 	lights?.each{data << getDeviceData(it, "light")}
