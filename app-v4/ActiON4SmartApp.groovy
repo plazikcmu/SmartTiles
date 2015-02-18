@@ -290,7 +290,23 @@ def command() {
 
 	def device
     
-	if (type == "switch" || type == "light" || type == "themeLight") {
+	if (type == "thermostatHeat" || type == "thermostatCool") {
+		def deviceSet = (type == "thermostatHeat" ? thermostatsHeat : thermostatCool)
+		device = deviceSet?.find{it.id == id}
+		if (device) {
+			var scale = getTemperatureScale()
+			def min = 10
+			def max = 30
+			if (scale == "F") {
+				min = 50
+				max = 90
+			}
+			if (value < min) value = min
+			else if (value > max) value = max
+			if (type == "thermostatHeat") device.setHeatingSetpoint(value)
+			else device.setCoolingSetpoint(value)
+		}
+	} if (type == "switch" || type == "light" || type == "themeLight") {
 		def deviceSet = (type == "switch" ? switches : (type == "light" ? lights : holiday))
 		device = deviceSet?.find{it.id == id}
 		if (device) {
