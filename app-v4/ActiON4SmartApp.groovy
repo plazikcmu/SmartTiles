@@ -604,10 +604,6 @@ def getDOW() {
     "${tf.format(new Date())}"
 }
 
-def renderThermostat(data) {
-"""<div class="tile thermostat h2" data-data=""></div>""" 
-}
-
 def renderModeTile(data) {
 """<div class="mode tile w2 menu ${data.isStandardMode ? data.mode : ""}" data-mode="$data.mode" data-popup="mode-popup">
 	<div class="title">Mode</div>
@@ -657,9 +653,8 @@ def getThermostatData(device, type) {
 	def data = [tile: "device", type: type, device: device.id, name: device.displayName]
 	device?.supportedAttributes?.each{
 		try {
-			data << ["$it": device.currentValue("$it")]
+			data << [("$it" as String): device.currentValue("$it")]
 		} catch (e) {
-			data << ["$it": "n/a"]
 			log.error e
 			log.debug "$device has trouble reporting $it. Is value not set when integer is expected?"
 		}
@@ -668,10 +663,9 @@ def getThermostatData(device, type) {
 }
 
 def renderTile(data) {
-	if (data.type == "thermostatHeat") {
-		def name = data.name
-		data.remove("name")
-		return """<div class="$data.thermostatType tile h2" data-name="$name" data-type="$data.thermostatType" data-device="$data.device" data-data='${data.encodeAsJSON()}'></div>"""
+	if (data.type == "thermostatHeat" || data.type == "thermostatCool") {
+		def relevantData = [humidity: data.humidity, temperature: data.temperature, thermostatFanMode: data.thermostatFanMode, thermostatOperatingState: data.thermostatOperatingState, setpoint: data.type == "thermostatHeat" ? data.heatingSetpoint : data.coolingSetpoint]
+		return """<div class="$data.type tile h2" data-name="$data.name" data-type="$data.type" data-device="$data.device" data-data='${relevantData.encodeAsJSON()}'></div>"""
 	} else if (data.type == "weather"){
 		def city = data.city
 		data.remove("city")
