@@ -401,6 +401,7 @@ def initialize() {
 	subscribe(dimmers, "switch", handler, [filterEvents: false])
     subscribe(dimmerLights, "level", handler, [filterEvents: false])
 	subscribe(dimmerLights, "switch", handler, [filterEvents: false])
+	subscribe(momentaries, "switch.on", handler, [filterEvents: false])
     subscribe(locks, "lock", handler, [filterEvents: false])
     subscribe(contacts, "contact", handler, [filterEvents: false])
     subscribe(presence, "presence", handler, [filterEvents: false])
