@@ -306,7 +306,7 @@ def command() {
 			if (type == "thermostatHeat") device.setHeatingSetpoint(value)
 			else device.setCoolingSetpoint(value)
 		}
-	} if (type == "switch" || type == "light" || type == "themeLight") {
+	} else if (type == "switch" || type == "light" || type == "themeLight") {
 		def deviceSet = (type == "switch" ? switches : (type == "light" ? lights : holiday))
 		device = deviceSet?.find{it.id == id}
 		if (device) {
@@ -417,7 +417,15 @@ def initialize() {
 	subscribe(music, "trackDescription", handler, [filterEvents: false])
 	subscribe(music, "mute", handler, [filterEvents: false])
 	
-	subscribe(thermostatsHeat, "thermostat", handler, [filterEvents: false])
+	subscribe(thermostatsHeat, "temperature", handler, [filterEvents: false])
+	subscribe(thermostatsHeat, "heatingSetpoint", handler, [filterEvents: false])
+	subscribe(thermostatsHeat, "thermostatFanMode", handler, [filterEvents: false])
+	subscribe(thermostatsHeat, "thermostatOperatingState", handler, [filterEvents: false])
+	
+	subscribe(thermostatsCool, "temperature", handler, [filterEvents: false])
+	subscribe(thermostatsCool, "coolingSetpoint", handler, [filterEvents: false])
+	subscribe(thermostatsCool, "thermostatFanMode", handler, [filterEvents: false])
+	subscribe(thermostatsCool, "thermostatOperatingState", handler, [filterEvents: false])
 }
 
 def sendURL_SMS(path) {
@@ -476,6 +484,7 @@ def head() {
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 
 <script>
+window.location.hash = "";
 var stateTS = ${getStateTS()};
 var tileSize = ${getTSize()};
 var readOnlyMode = ${readOnlyMode ?: false};
@@ -666,26 +675,25 @@ def getWeatherData(device) {
 }
 
 def getThermostatData(device, type) {
-	def data = [tile: "device", type: type, device: device.id, name: device.displayName]
+	def deviceData = [:]
 	device?.supportedAttributes?.each{
 		try {
-			data << [("$it" as String): device.currentValue("$it")]
+			deviceData << [("$it" as String): device.currentValue("$it")]
 		} catch (e) {
 			log.error e
 			log.debug "$device has trouble reporting $it. Is value not set when integer is expected?"
 		}
 	}
-	data
+	[tile: "device", type: type, device: device.id, name: device.displayName, humidity: deviceData.humidity, temperature: deviceData.temperature, thermostatFanMode: deviceData.thermostatFanMode, thermostatOperatingState: deviceData.thermostatOperatingState, setpoint: type == "thermostatHeat" ? deviceData.heatingSetpoint : deviceData.coolingSetpoint]
 }
 
 def renderTile(data) {
 	if (data.type == "thermostatHeat" || data.type == "thermostatCool") {
-		def relevantData = [humidity: data.humidity, temperature: data.temperature, thermostatFanMode: data.thermostatFanMode, thermostatOperatingState: data.thermostatOperatingState, setpoint: data.type == "thermostatHeat" ? data.heatingSetpoint : data.coolingSetpoint]
-		return """<div class="$data.type tile h2" data-name="$data.name" data-type="$data.type" data-device="$data.device" data-data='${relevantData.encodeAsJSON()}'></div>"""
+		return  """<div class="$data.type tile h2" data-name="$data.name" data-type="$data.type" data-device="$data.device" data-data="{:}"><div class="title">$data.name<br/><span class="title2">${data.temperature}&deg;, $data.thermostatOperatingState</span></div><div class="icon setpoint">$data.setpoint&deg;</div><div class="icon up"><i class="fa fa-fw fa-chevron-up"></i></div><div class="icon down"><i class="fa fa-fw fa-chevron-down"></i></div><div class="footer">&#10044; $data.thermostatFanMode ${data.humidity ? ",<i class='fa fa-fw wi wi-sprinkles'></i>" + data.humidity  + "%" : ""}</div></div>"""
 	} else if (data.type == "weather"){
 		def city = data.city
 		data.remove("city")
-		return """<div class="weather tile w2" data-type="weather" data-device="$data.device" data-city="$city" data-weather='${data.encodeAsJSON()}'></div>"""
+		return """<div class="weather tile w2" data-type="weather" data-device="$data.device" data-city="$city" data-data='${data.encodeAsJSON()}'></div>"""
 	} else if (data.type == "music") {
 		return """
 		<div class="music tile w2 $data.active ${data.mute ? "muted" : ""}" data-type="music" data-device="$data.device" data-level="$data.level" data-track-description="$data.trackDescription" data-mute="$data.mute">
