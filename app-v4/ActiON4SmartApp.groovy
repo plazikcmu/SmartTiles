@@ -1,5 +1,5 @@
 /**
- *  ActiON Dashboard 5.0
+ *  ActiON Dashboard 5.0.0
  *
  *  Visit Home Page for more information:
  *  http://action-dashboard.github.io/
@@ -20,7 +20,7 @@
  *
  */
 definition(
-    name: "ActiON5.0",
+    name: "ActiON5.0.0",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
@@ -278,31 +278,27 @@ def oauthError() {[error: "OAuth token is invalid or access has been revoked"]}
 
 def viewLinkError() {[error: "You are not authorized to view OAuth access token"]}
 
+def getMinTemp() {getTemperatureScale() == "F" ? 50 : 10}
+def getMaxTemp() {getTemperatureScale() == "F" ? 90 : 30}
+
 def command() {
 	log.debug "command received with params $params"
-    
 	if (disableDashboard || readOnlyMode) return [status: "disabled"]
-	
+
     def id = params.device
     def type = params.type
     def command = params.command
 	def value = params.value
 
 	def device
-    
+
 	if (type == "thermostatHeat" || type == "thermostatCool") {
 		def deviceSet = (type == "thermostatHeat" ? thermostatsHeat : thermostatCool)
 		device = deviceSet?.find{it.id == id}
+		value = value.toInteger()
 		if (device) {
-			var scale = getTemperatureScale()
-			def min = 10
-			def max = 30
-			if (scale == "F") {
-				min = 50
-				max = 90
-			}
-			if (value < min) value = min
-			else if (value > max) value = max
+			if (value < getMinTemp()) value = getMinTemp()
+			else if (value > getMaxTemp()) value = getMaxTemp()
 			if (type == "thermostatHeat") device.setHeatingSetpoint(value)
 			else device.setCoolingSetpoint(value)
 		}
@@ -346,6 +342,7 @@ def command() {
     	location.helloHome.execute(command)
     } else if (type == "momentary") {
     	momentaries?.find{it.id == id}?.push()
+		updateStateTS()
     } else if (type == "camera") {
     	camera?.find{it.id == id}.take()
     } else if (type == "music") {
@@ -463,7 +460,6 @@ def generateURL(path) {
 def scheduledWeatherRefresh() {
     runIn(3600, scheduledWeatherRefresh, [overwrite: false])
 	weather?.refresh()
-    state.lastWeatherRefresh = getTS()
 	updateStateTS()
 }
 
@@ -490,7 +486,9 @@ var stateTS = ${getStateTS()};
 var tileSize = ${getTSize()};
 var readOnlyMode = ${readOnlyMode ?: false};
 var icons = ${getTileIcons().encodeAsJSON()};
-var smartAppVersion = "5.0";
+var smartAppVersion = "5.0.0";
+var minTemp = ${getMinTemp()};
+var maxTemp = ${getMaxTemp()};
 </script>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
@@ -690,11 +688,9 @@ def getThermostatData(device, type) {
 
 def renderTile(data) {
 	if (data.type == "thermostatHeat" || data.type == "thermostatCool") {
-		return  """<div class="$data.type tile h2" data-name="$data.name" data-type="$data.type" data-device="$data.device" data-data="{:}"><div class="title">$data.name<br/><span class="title2">${data.temperature}&deg;, $data.thermostatOperatingState</span></div><div class="icon setpoint">$data.setpoint&deg;</div><div class="icon up"><i class="fa fa-fw fa-chevron-up"></i></div><div class="icon down"><i class="fa fa-fw fa-chevron-down"></i></div><div class="footer">&#10044; $data.thermostatFanMode ${data.humidity ? ",<i class='fa fa-fw wi wi-sprinkles'></i>" + data.humidity  + "%" : ""}</div></div>"""
+		return  """<div class="$data.type tile h2" data-type="$data.type" data-device="$data.device" data-setpoint="$data.setpoint"><div class="title">$data.name<br/><span class="title2">${data.temperature}&deg;, $data.thermostatOperatingState</span></div><div class="icon setpoint">$data.setpoint&deg;</div><div class="icon up"><i class="fa fa-fw fa-chevron-up"></i></div><div class="icon down"><i class="fa fa-fw fa-chevron-down"></i></div><div class="footer">&#10044; $data.thermostatFanMode ${data.humidity ? ",<i class='fa fa-fw wi wi-sprinkles'></i>" + data.humidity  + "%" : ""}</div></div>"""
 	} else if (data.type == "weather"){
-		def city = data.city
-		data.remove("city")
-		return """<div class="weather tile w2" data-type="weather" data-device="$data.device" data-city="$city" data-data='${data.encodeAsJSON()}'></div>"""
+		return """<div class="weather tile w2 ${data.weather.replaceAll("_", "").toLowerCase()} $data.icon" data-type="weather" data-device="$data.device"><div class="title">$data.city<br/><span class="title2">$data.weather, feels like $data.feelsLike&deg;</span></div><div class="icon"><span class="text">$data.temperature&deg;</span><i class="wi $data.icon"></i></span></div><div class="footer">$data.localSunrise <i class="fa fa-fw wi wi-horizon-alt"></i> $data.localSunset</div><div class="footer right">$data.percentPrecip%<i class="fa fa-fw fa-umbrella"></i><br>$data.humidity%<i class="fa fa-fw wi wi-sprinkles"></i></div></div>"""
 	} else if (data.type == "music") {
 		return """
 		<div class="music tile w2 $data.active ${data.mute ? "muted" : ""}" data-type="music" data-device="$data.device" data-level="$data.level" data-track-description="$data.trackDescription" data-mute="$data.mute">
