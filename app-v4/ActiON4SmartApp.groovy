@@ -748,20 +748,19 @@ def getTileIcons() {
         helloHome : "<i class='fa fa-fw fa-comment-o'></i>",
         link : "<i class='fa fa-fw fa-link'></i>",
         dashboard : "<i class='fa fa-fw fa-th'></i>",
-        thermostatHeat : "<i class='fa fa-fw fa-th'></i>",
-        thermostatCool : "<i class='fa fa-fw'> &#10052;</i>",
-		themeLight: getThemeLightIcon()
+        thermostatHeat : "<i class='fa fa-fw wi wi-snow'></i>",
+        thermostatCool : "<i class='fa fa-fw'></i>",
+		themeLight: getThemeLightIcon(),
+		clock: """<i class="fa fa-fw fa-clock-o"></i>""",
+		mode: """<i class="fa fa-fw fa-gear"></i>""",
+		weather: """<i class="fa fa-fw wi wi-day-rain-mix"></i>""",
+		music: """<i class="fa fa-fw fa-music"></i>""",
+		video: """<i class="fa fa-fw fa-video-camera"></i>""",
 	]
 }
 
 def getListIcon(type) {
 	def icons = [
-		clock: """<i class="fa fa-fw fa-clock-o"></i>""",
-		mode: """<i class="fa fa-fw fa-gear"></i>""",
-		weather: """<i class="fa fa-fw fa-sun-o"></i>""",
-		music: """<i class="fa fa-fw fa-music"></i>""",
-		video: """<i class="fa fa-fw fa-video-camera"></i>""",
-		"hello-home": getTileIcons().helloHome,
 		lock: getTileIcons().lock.locked,
 		switch: getTileIcons().switch.on,
 		light: getTileIcons().light.on,
@@ -772,19 +771,9 @@ def getListIcon(type) {
 		contact: getTileIcons().contact.open,
 		presence: getTileIcons().presence.present,
 		motion: getTileIcons().motion.active,
-		camera: getTileIcons().camera,
-		temperature: getTileIcons().temperature,
-		humidity: getTileIcons().humidity,
-		water: getTileIcons().humidity,
-		energy: getTileIcons().energy,
-		power: getTileIcons().power,
-		battery: getTileIcons().battery,
-		link: getTileIcons().link,
-		dashboard: getTileIcons().dashboard,
-		refresh: getTileIcons().refresh,
 	]
 	
-	icons[type]
+	icons[type] ?: getTileIcons()[type]
 }
 
 def getThemeLightIcon() {
