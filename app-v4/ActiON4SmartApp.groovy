@@ -745,11 +745,11 @@ def getTileIcons() {
 		energy : "<i class='fa fa-fw wi wi-lightning'></i>",
 		power : "<i class='fa fa-fw fa-bolt'></i>",
 		battery : "<i class='fa fa-fw fa-fw batt'></i>",
-        helloHome : "<i class='fa fa-fw fa-comment-o'></i>",
+        "hello-home" : "<i class='fa fa-fw fa-comment-o'></i>",
         link : "<i class='fa fa-fw fa-link'></i>",
         dashboard : "<i class='fa fa-fw fa-th'></i>",
-        thermostatHeat : "<i class='fa fa-fw wi wi-snow'></i>",
-        thermostatCool : "<i class='fa fa-fw'></i>",
+        thermostatHeat : "<i class='fa fa-fw fa-fire'></i>",
+        thermostatCool : "<i class='fa fa-fw wi wi-snow'></i>",
 		themeLight: getThemeLightIcon(),
 		clock: """<i class="fa fa-fw fa-clock-o"></i>""",
 		mode: """<i class="fa fa-fw fa-gear"></i>""",
@@ -771,6 +771,7 @@ def getListIcon(type) {
 		contact: getTileIcons().contact.open,
 		presence: getTileIcons().presence.present,
 		motion: getTileIcons().motion.active,
+		water: getTileIcons().water.wet,
 	]
 	
 	icons[type] ?: getTileIcons()[type]
