@@ -78,7 +78,7 @@ def controlThings() {
 			input "dimmerLights", "capability.switchLevel", title: "Which Dimmable Lights?", multiple: true, required: false
 			input "dimmers", "capability.switchLevel", title: "Which Dimmable Switches?", multiple: true, required: false
 			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
-			input "holiday", "capability.switch", title: "Which Theme Lights?", multiple: true, required: false
+			input "themeLights", "capability.switch", title: "Which Theme Lights?", multiple: true, required: false
 		}
 		
 		section("Control these thermostats...") {
@@ -88,7 +88,7 @@ def controlThings() {
 		
 		section("Control these things...") {
 			input "locks", "capability.lock", title: "Which Locks?", multiple: true, required: false
-			input "camera", "capability.imageCapture", title: "Which Cameras?", multiple: true, required: false
+			input "camera", "capability.imageCapture", title: "Which Cameras (Image Capture)?", multiple: true, required: false
 			input "music", "capability.musicPlayer", title: "Which Music Players?", multiple: true, required: false
 		}
 		
@@ -189,7 +189,7 @@ def preferences() {
 			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: true
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Small", "Normal", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
-			input "holidayType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
+			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
 		}
 		
 		section("More Tiles...") {
@@ -303,7 +303,7 @@ def command() {
 			else device.setCoolingSetpoint(value)
 		}
 	} else if (type == "switch" || type == "light" || type == "themeLight") {
-		def deviceSet = (type == "switch" ? switches : (type == "light" ? lights : holiday))
+		def deviceSet = (type == "switch" ? switches : (type == "light" ? lights : themeLights))
 		device = deviceSet?.find{it.id == id}
 		if (device) {
 			if(device.currentValue('switch') == "on") {
@@ -385,10 +385,10 @@ def initialize() {
 	updateStateTS()
 	
 	subscribe(location, handler)
-	subscribe(holiday, "switch.on", handler, [filterEvents: false])
-	subscribe(holiday, "switch.off", handler, [filterEvents: false])
-	subscribe(holiday, "switch", handler, [filterEvents: false])
-	subscribe(holiday, "level", handler, [filterEvents: false])
+	subscribe(themeLights, "switch.on", handler, [filterEvents: false])
+	subscribe(themeLights, "switch.off", handler, [filterEvents: false])
+	subscribe(themeLights, "switch", handler, [filterEvents: false])
+	subscribe(themeLights, "level", handler, [filterEvents: false])
 	subscribe(lights, "switch.on", handler, [filterEvents: false])
 	subscribe(lights, "switch.off", handler, [filterEvents: false])
 	subscribe(lights, "switch", handler, [filterEvents: false])
@@ -688,7 +688,7 @@ def getThermostatData(device, type) {
 
 def renderTile(data) {
 	if (data.type == "thermostatHeat" || data.type == "thermostatCool") {
-		return  """<div class="$data.type tile h2" data-type="$data.type" data-device="$data.device" data-setpoint="$data.setpoint"><div class="title">$data.name<br/><span class="title2">${data.temperature}&deg;, $data.thermostatOperatingState</span></div><div class="icon setpoint">$data.setpoint&deg;</div><div class="icon up"><i class="fa fa-fw fa-chevron-up"></i></div><div class="icon down"><i class="fa fa-fw fa-chevron-down"></i></div><div class="footer">&#10044; $data.thermostatFanMode ${data.humidity ? ",<i class='fa fa-fw wi wi-sprinkles'></i>" + data.humidity  + "%" : ""}</div></div>"""
+		return  """<div class="$data.type tile h2" data-type="$data.type" data-device="$data.device" data-setpoint="$data.setpoint"><div class="title">$data.name ${getTileIcons()[data.type]}<br/><span class="title2">${data.temperature}&deg;, $data.thermostatOperatingState</span></div><div class="icon setpoint">$data.setpoint&deg;</div><div class="icon up"><i class="fa fa-fw fa-chevron-up"></i></div><div class="icon down"><i class="fa fa-fw fa-chevron-down"></i></div><div class="footer">&#10044; $data.thermostatFanMode ${data.humidity ? ",<i class='fa fa-fw wi wi-sprinkles'></i>" + data.humidity  + "%" : ""}</div></div>"""
 	} else if (data.type == "weather"){
 		return """<div class="weather tile w2" data-type="weather" data-device="$data.device" data-weather="$data.weatherIcon"><div class="title">$data.city<br/><span class="title2">$data.weather, feels like $data.feelsLike&deg;</span></div><div class="icon"><span class="text">$data.temperature&deg;</span><i class="wi $data.icon"></i></span></div><div class="footer">$data.localSunrise <i class="fa fa-fw wi wi-horizon-alt"></i> $data.localSunset</div><div class="footer right">$data.percentPrecip%<i class="fa fa-fw fa-umbrella"></i><br>$data.humidity%<i class="fa fa-fw wi wi-sprinkles"></i></div></div>"""
 	} else if (data.type == "music") {
@@ -782,7 +782,7 @@ def getThemeLightIcon() {
 	"Valentine's Day" : [on : "<i class='active fa fa-fw fa-heart'></i>", off : "<i class='inactive fa fa-fw fa-heart-o'></i>", css: ".themeLight {background-color: #FF82B2;} /*pink*/ .themeLight.active {background-color: #A90000} .themeLight.active .icon i {color:#EA001F}"],
 	"Christmas" : [on: "<i class='active fa fa-fw fa-tree'></i>", off: "<i class='inactive fa fa-fw fa-tree'></i>", css: ".themeLight {background-color: #11772D;} /*green*/ .themeLight.active {background-color: #AB0F0B} .themeLight.active .icon i {color:#11772D}"],
     ]
-	icons[holidayType] ?: [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>", css : ""]
+	icons[themeLightType] ?: [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>", css : ""]
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
@@ -861,7 +861,7 @@ def allDeviceData() {
 	music?.each{data << getMusicPlayerData(it)}
 	switches?.each{data << getDeviceData(it, "switch")}
 	lights?.each{data << getDeviceData(it, "light")}
-	holiday?.each{data << getDeviceData(it, "themeLight")}
+	themeLights?.each{data << getDeviceData(it, "themeLight")}
 	dimmers?.each{data << getDeviceData(it, "dimmer")}
 	dimmerLights?.each{data << getDeviceData(it, "dimmerLight")}
 	momentaries?.each{data << getDeviceData(it, "momentary")}
