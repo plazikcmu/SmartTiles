@@ -629,7 +629,7 @@ def getDOW() {
 }
 
 def renderModeTile(data) {
-"""<div class="mode tile w2 menu ${data.isStandardMode ? data.mode : ""} mode-${data.mode.replaceall(" ", "-")}" data-mode="$data.mode" data-popup="mode-popup">
+"""<div class="mode tile w2 menu ${data.isStandardMode ? data.mode : ""}" data-mode="$data.mode" data-popup="mode-popup">
 	<div class="title">Mode</div>
 	<div data-role="popup" id="mode-popup" data-overlay-theme="b">
 		<ul data-role="listview" data-inset="true" style="min-width:210px;">
@@ -690,7 +690,7 @@ def renderTile(data) {
 	if (data.type == "thermostatHeat" || data.type == "thermostatCool") {
 		return  """<div class="$data.type tile h2" data-type="$data.type" data-device="$data.device" data-setpoint="$data.setpoint"><div class="title">$data.name<br/><span class="title2">${data.temperature}&deg;, $data.thermostatOperatingState</span></div><div class="icon setpoint">$data.setpoint&deg;</div><div class="icon up"><i class="fa fa-fw fa-chevron-up"></i></div><div class="icon down"><i class="fa fa-fw fa-chevron-down"></i></div><div class="footer">&#10044; $data.thermostatFanMode ${data.humidity ? ",<i class='fa fa-fw wi wi-sprinkles'></i>" + data.humidity  + "%" : ""}</div></div>"""
 	} else if (data.type == "weather"){
-		return """<div class="weather tile w2 data.weatherIcon" data-type="weather" data-device="$data.device"><div class="title">$data.city<br/><span class="title2">$data.weather, feels like $data.feelsLike&deg;</span></div><div class="icon"><span class="text">$data.temperature&deg;</span><i class="wi $data.icon"></i></span></div><div class="footer">$data.localSunrise <i class="fa fa-fw wi wi-horizon-alt"></i> $data.localSunset</div><div class="footer right">$data.percentPrecip%<i class="fa fa-fw fa-umbrella"></i><br>$data.humidity%<i class="fa fa-fw wi wi-sprinkles"></i></div></div>"""
+		return """<div class="weather tile w2" data-type="weather" data-device="$data.device" data-weather="$data.weatherIcon"><div class="title">$data.city<br/><span class="title2">$data.weather, feels like $data.feelsLike&deg;</span></div><div class="icon"><span class="text">$data.temperature&deg;</span><i class="wi $data.icon"></i></span></div><div class="footer">$data.localSunrise <i class="fa fa-fw wi wi-horizon-alt"></i> $data.localSunset</div><div class="footer right">$data.percentPrecip%<i class="fa fa-fw fa-umbrella"></i><br>$data.humidity%<i class="fa fa-fw wi wi-sprinkles"></i></div></div>"""
 	} else if (data.type == "music") {
 		return """
 		<div class="music tile w2 $data.active ${data.mute ? "muted" : ""}" data-type="music" data-device="$data.device" data-level="$data.level" data-track-description="$data.trackDescription" data-mute="$data.mute">
