@@ -185,11 +185,15 @@ def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section("Preferences...") {
 			label title: "Title", required: false, defaultValue: "ActiON4"
-			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
-			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: true
-			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Small", "Normal", "Large"]
+			input "theme", title: "Theme", "enum", multiple: false, required: true, defaultValue: "Metro", options: ["Jasper", "Slate", "Quartz"]
+			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Small", options: ["Small", "Normal", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
+			paragraph ""
+			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: false
+			paragraph ""
 			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
+			paragraph ""
+			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
 		}
 		
 		section("More Tiles...") {
@@ -599,9 +603,9 @@ ${getThemeLightIcon().css}
 }  
 
 def getTSize() {
-	if (tileSize == "Small") return 105
-	if (tileSize == "Large") return 150
-	120
+	if (tileSize == "Medium") return 120
+	else if (tileSize == "Large") return 150
+	105
 }
 
 def getFSize() {
@@ -886,7 +890,7 @@ def allDeviceData() {
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
 }
 
-def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body style='background-color:black'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
+def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
 def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile(it)}.join("\n")}<div class="blank tile"></div></div>"""}
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
