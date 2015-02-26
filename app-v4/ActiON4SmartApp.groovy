@@ -184,7 +184,7 @@ def dashboards() {
 def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section("Preferences...") {
-			label title: "Title", required: false, defaultValue: "ActiON4"
+			label title: "Title", required: false, defaultValue: "ActiON5"
 			input "theme", title: "Theme", "enum", multiple: false, required: true, options: ["": "Jasper (default)", slate: "Slate", quartz: "Quartz"]
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Small", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
@@ -890,7 +890,7 @@ def allDeviceData() {
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
 }
 
-def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class="theme-${theme}" data-theme="$theme">\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
+def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
 def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile(it)}.join("\n")}<div class="blank tile"></div></div>"""}
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
