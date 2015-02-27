@@ -873,8 +873,8 @@ def allDeviceData() {
 	presence?.each{data << getDeviceData(it, "presence")}
 	motion?.each{data << getDeviceData(it, "motion")}
 	camera?.each{data << getDeviceData(it, "camera")}
-	(1..10).each{if (settings["dropcamStreamUrl$it"]) {data << [tile: "video", link: settings["dropcamStreamUrl$it"], name: settings["dropcamStreamT$it"] ?: "Stream $it", i: it, type: "video"]}}
-	(1..10).each{if (settings["mjpegStreamUrl$it"]) {data << [tile: "genericMJPEGvideo", link: settings["mjpegStreamUrl$it"], name: settings["mjpegStreamTitile$it"] ?: "Stream $it", i: it, type: "video"]}}
+	(1..10).each{if (settings["dropcamStreamUrl$it"]) {data << [tile: "video", device: "$it", link: settings["dropcamStreamUrl$it"], name: settings["dropcamStreamT$it"] ?: "Stream $it", i: it, type: "video"]}}
+	(1..10).each{if (settings["mjpegStreamUrl$it"]) {data << [tile: "genericMJPEGvideo", device: "$it", link: settings["mjpegStreamUrl$it"], name: settings["mjpegStreamTitile$it"] ?: "Stream $it", i: it, type: "video"]}}
 	temperature?.each{data << getDeviceData(it, "temperature")}
 	humidity?.each{data << getDeviceData(it, "humidity")}
 	water?.each{data << getDeviceData(it, "water")}
@@ -882,8 +882,8 @@ def allDeviceData() {
 	power?.each{data << getDeviceData(it, "power")}
 	battery?.each{data << getDeviceData(it, "battery")}
 	
-	(1..10).each{if (settings["linkUrl$it"]) {data << [tile: "link", link: settings["linkUrl$it"], name: settings["linkTitle$it"] ?: "Link $it", i: it, type: "link"]}}
-	(1..10).each{if (settings["dashboardUrl$it"]) {data << [tile: "dashboard", link: settings["dashboardUrl$it"], name: settings["dashboardTitle$it"] ?: "Dashboard $it", i: it, type: "dashboard"]}}
+	(1..10).each{if (settings["linkUrl$it"]) {data << [tile: "link", device: "$it", link: settings["linkUrl$it"], name: settings["linkTitle$it"] ?: "Link $it", i: it, type: "link"]}}
+	(1..10).each{if (settings["dashboardUrl$it"]) {data << [tile: "dashboard", device: "$it", link: settings["dashboardUrl$it"], name: settings["dashboardTitle$it"] ?: "Dashboard $it", i: it, type: "dashboard"]}}
 	
 	data << refresh
 	
