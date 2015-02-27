@@ -115,11 +115,11 @@ def videoStreams() {
 		}
 		
 		(1..10).each{
-			def vsTitle = "dropcamStreamT$it"
-			def vsLink = "dropcamStreamUrl$it"
+			def title = "dropcamStreamT$it"
+			def link = "dropcamStreamUrl$it"
 			section("Dropcam Video Stream $it") {
-				input vsTitle, "text", title:"Title", required: false
-				input vsLink, "text", title:"URL", required: false
+				input title, "text", title:"Title", required: false
+				input link, "text", title:"URL", required: false
 			}
 		}
 	}
@@ -136,11 +136,11 @@ def videoStreamsMJPEG() {
 		}
 		
 		(1..10).each{
-			def gvsTitle = "mjpegStreamTitile$it"
-			def gvsLink = "mjpegStreamUrl$it"
+			def title = "mjpegStreamTitile$it"
+			def link = "mjpegStreamUrl$it"
 			section("Generic MJPEG Video Stream $it") {
-				input gvsTitle, "text", title:"Title", required: false
-				input gvsLink, "text", title:"URL", required: false
+				input title, "text", title:"Title", required: false
+				input link, "text", title:"URL", required: false
 			}
 		}
 	}
@@ -153,12 +153,12 @@ def links() {
 		}
 		
 		(1..10).each{
-			def lTitle = "linkTitle$it"
-			def lLink = "linkUrl$it"
+			def title = "linkTitle$it"
+			def link = "linkUrl$it"
 			log.debug "t: $t, l: $l"
 			section("Link $it") {
-				input lTitle, "text", title:"Title", required: false
-				input lLink, "text", title:"URL", required: false
+				input title, "text", title:"Title", required: false
+				input link, "text", title:"URL", required: false
 			}
 		}
 	}
@@ -170,12 +170,12 @@ def dashboards() {
 			paragraph "Enter absolute URL starting with https..."
 		}
 		(1..10).each{
-			def dTitle = "dashboardTitle$it"
-			def dLink = "dashboardUrl$it"
+			def title = "dashboardTitle$it"
+			def link = "dashboardUrl$it"
 			log.debug "t: $t, l: $l"
 			section("Dashboard $it") {
-				input dTitle, "text", title:"Title", required: false
-				input dLink, "text", title:"URL", required: false
+				input title, "text", title:"Title", required: false
+				input link, "text", title:"URL", required: false
 			}
 		}
 	}
@@ -184,7 +184,7 @@ def dashboards() {
 def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section("Preferences...") {
-			label title: "Title", required: false, defaultValue: "ActiON 5.0.0"
+			label title: "Title", required: false, defaultValue: "ActiON4"
 			input "theme", title: "Theme", "enum", multiple: false, required: true, options: ["": "Jasper (default)", slate: "Slate", quartz: "Quartz"]
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Small", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
@@ -228,7 +228,7 @@ def authenticationPreferences() {
 }
 
 def viewURL() {
-	dynamicPage(name: "viewURL", title: " ${title ?: location.name} Dashboard URL", install:!resetOauth, nextPage: resetOauth ? "viewURL" : null) {
+	dynamicPage(name: "viewURL", title: "ActiON Dashboard", install:!resetOauth, nextPage: resetOauth ? "viewURL" : null) {
 		if (resetOauth) {
 			generateURL(null)
 			
@@ -238,12 +238,12 @@ def viewURL() {
 			}
 		} else {
 			section() {
-				paragraph "Copy the URL below to any modern browser to view ${title ?: location.name} Dashboard. Add a shortcut to home screen of your mobile device to run as a native app."
+				paragraph "Copy the URL below to any modern browser to view ${title ?: location.name} ActiON Dashboard. Add a shortcut to home screen of your mobile device to run as a native app."
 				href url:"${generateURL("link").join()}", style:"embedded", required:false, title:"URL", description:"Tap to view, then click \"Done\""
 			}
 			
 			section("Send URL via SMS...") {
-				paragraph "Optionally, send SMS containing the URL of ${title ?: location.name} Dashboard to a phone number. The URL will be sent in two parts because it's too long."
+				paragraph "Optionally, send SMS containing the URL of this dashboard to a phone number. The URL will be sent in two parts because it's too long."
 				input "phone", "phone", title: "Which phone?", required: false
 			}
 		}
@@ -890,13 +890,13 @@ def allDeviceData() {
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
 }
 
-def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
+def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class="theme-${theme}" data-theme="$theme">\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
 def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile(it)}.join("\n")}<div class="blank tile"></div></div>"""}
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
 
 def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8" />
-<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} Dashboard URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} ActiON Dashboard URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body style='background-color:black; color: white'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
