@@ -499,7 +499,6 @@ var appVersion = "${appVersion()}";
 var minTemp = ${getMinTemp()};
 var maxTemp = ${getMaxTemp()};
 var theme = "$theme";
-var cloclColor = "";
 </script>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
