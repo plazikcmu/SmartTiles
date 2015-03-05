@@ -20,7 +20,7 @@
  *
  */
 definition(
-    name: "ActiON5.0.0",
+    name: "ActiON5",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
@@ -35,10 +35,10 @@ preferences {
     
         section("About") {
             paragraph "ActiON Dashboard, a SmartThings web client.\n\nYour home has a Home Page!™"
-            paragraph "Version 5.0.0\n\n" +
+            paragraph "Version ${appVersion()}\n\n" +
             "If you like this app, please support the developer via PayPal:\n\ndonate@SmartTiles.click\n\n" +
             "Copyright © 2014 Alex Malikov"
-			href url:"http://SmartTiles.click/info", style:"embedded", required:false, title:"More information...", description:"http://SmartTiles.click/info"
+			href url:"http://SmartTiles.click", style:"embedded", required:false, title:"More information...", description:"http://SmartTiles.click"
         }
 		
 		section("Things...") {
@@ -70,39 +70,41 @@ preferences {
 	page(name: "viewURL", title: "viewURL")
 }
 
+def appVersion() {"5.0.0"}
+
 def controlThings() {
 	dynamicPage(name: "controlThings", title: "Things", install: false) {
 		section("Control these lights...") {
-			input "lights", "capability.switch", title: "Select Lights...", multiple: true, required: false
-			input "dimmerLights", "capability.switchLevel", title: "Select Dimmable Lights...", multiple: true, required: false
-			input "switches", "capability.switch", title: "Select Switches...", multiple: true, required: false
-			input "dimmers", "capability.switchLevel", title: "Select Dimmable Switches...", multiple: true, required: false
-			input "momentaries", "capability.momentary", title: "Select Momentary Switches...", multiple: true, required: false
-			input "themeLights", "capability.switch", title: "Select Theme Lights...", multiple: true, required: false
+			input "lights", "capability.switch", title: "Lights...", multiple: true, required: false
+			input "dimmerLights", "capability.switchLevel", title: "Dimmable Lights...", multiple: true, required: false
+			input "switches", "capability.switch", title: "Switches...", multiple: true, required: false
+			input "dimmers", "capability.switchLevel", title: "Dimmable Switches...", multiple: true, required: false
+			input "momentaries", "capability.momentary", title: "Momentary Switches...", multiple: true, required: false
+			input "themeLights", "capability.switch", title: "Theme Lights...", multiple: true, required: false
 		}
 		
 		section("Control these thermostats...") {
-			input "thermostatsHeat", "capability.thermostat", title: "Select Heating Thermostats...", multiple: true, required: false
-			input "thermostatsCool", "capability.thermostat", title: "Select Cooling Thermostats...", multiple: true, required: false
+			input "thermostatsHeat", "capability.thermostat", title: "Heating Thermostats...", multiple: true, required: false
+			input "thermostatsCool", "capability.thermostat", title: "Cooling Thermostats...", multiple: true, required: false
 		}
 		
 		section("Control these things...") {
-			input "locks", "capability.lock", title: "Select Locks...", multiple: true, required: false
+			input "locks", "capability.lock", title: "Locks...", multiple: true, required: false
 			input "music", "capability.musicPlayer", title: "Which Music Players?", multiple: true, required: false
-			input "camera", "capability.imageCapture", title: "Select Cameras (Image Capture)...", multiple: true, required: false
+			input "camera", "capability.imageCapture", title: "Cameras (Image Capture)...", multiple: true, required: false
 		}
 		
 		section("View state of these things...") {
-            input "contacts", "capability.contactSensor", title: "Select Contact...", multiple: true, required: false
-            input "presence", "capability.presenceSensor", title: "Select Presence...", multiple: true, required: false
-            input "temperature", "capability.temperatureMeasurement", title: "Select Temperature...", multiple: true, required: false
-            input "motion", "capability.motionSensor", title: "Select Motion Sensors...", multiple: true, required: false
-            input "humidity", "capability.relativeHumidityMeasurement", title: "Select Hygrometer...", multiple: true, required: false
-            input "water", "capability.waterSensor", title: "Select Water Sensors...", multiple: true, required: false
-            input "battery", "capability.battery", title: "Select Battery Status...", multiple: true, required: false
-            input "energy", "capability.energyMeter", title: "Select Energy Meters...", multiple: true, required: false
-            input "power", "capability.powerMeter", title: "Select Power Meters...", multiple: true, required: false
-            input "weather", "device.smartweatherStationTile", title: "Select Weather...", multiple: true, required: false
+            input "presence", "capability.presenceSensor", title: "Presence Sensors...", multiple: true, required: false
+            input "contacts", "capability.contactSensor", title: "Contact Sensors...", multiple: true, required: false
+            input "motion", "capability.motionSensor", title: "Motion Sensors...", multiple: true, required: false
+            input "temperature", "capability.temperatureMeasurement", title: "Temperature...", multiple: true, required: false
+            input "humidity", "capability.relativeHumidityMeasurement", title: "Hygrometer...", multiple: true, required: false
+            input "water", "capability.waterSensor", title: "Water Sensors...", multiple: true, required: false
+            input "battery", "capability.battery", title: "Battery Status...", multiple: true, required: false
+            input "energy", "capability.energyMeter", title: "Energy Meters...", multiple: true, required: false
+            input "power", "capability.powerMeter", title: "Power Meters...", multiple: true, required: false
+            input "weather", "device.smartweatherStationTile", title: "Weather...", multiple: true, required: false
         }
 	}
 }
@@ -184,11 +186,11 @@ def dashboards() {
 def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section() {
-			label title: "Title", required: false, defaultValue: "ActiON 5.0.0"
+			label title: "Title", required: false, defaultValue: "ActiON ${appVersion()}"
 		}
 		
 		section() {
-			input "theme", title: "Theme", "enum", multiple: false, required: true, options: [default: "Jasper (default)", slate: "Slate", quartz: "Quartz"]
+			input "theme", title: "Theme", "enum", multiple: false, required: true, options: [default: "Metro (default)", slate: "Slate", quartz: "Quartz", onyx: "Onyx"]
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Small", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
 			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: false
@@ -484,7 +486,7 @@ def head() {
 <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
-<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.5.0.0.min.css?u=0" rel="stylesheet">
+<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.${appVersion()}.min.css?u=0" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 
 <script>
@@ -493,14 +495,16 @@ var stateTS = ${getStateTS()};
 var tileSize = ${getTSize()};
 var readOnlyMode = ${readOnlyMode ?: false};
 var icons = ${getTileIcons().encodeAsJSON()};
-var smartAppVersion = "5.0.0";
+var appVersion = "${appVersion()}";
 var minTemp = ${getMinTemp()};
 var maxTemp = ${getMaxTemp()};
+var theme = "$theme";
+var cloclColor = "";
 </script>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
-<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.5.0.0.min.js?u=0" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/prod/script.${appVersion()}.min.js?u=0" type="text/javascript"></script>
 
 <style>
 .tile {width: ${getTSize()}px; height: ${getTSize()}px;}
@@ -550,7 +554,7 @@ def headList() {
 <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
-<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.5.0.0.min.css?u=0" rel="stylesheet">
+<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.${appVersion()}.min.css?u=0" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
