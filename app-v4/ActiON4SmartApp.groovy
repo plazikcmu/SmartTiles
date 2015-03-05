@@ -24,7 +24,7 @@ definition(
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
-    category: "Convenience",
+    category: "SmartThings Labs",
     iconUrl: "http://action-dashboard.github.io/icon.png",
     iconX2Url: "http://action-dashboard.github.io/icon.png",
     oauth: true)
@@ -35,10 +35,10 @@ preferences {
     
         section("About") {
             paragraph "ActiON Dashboard, a SmartThings web client.\n\nYour home has a Home Page!™"
-            paragraph "Version 5.0\n\n" +
-            "If you like this app, please support the developer via PayPal:\n\nalex.smart.things@gmail.com\n\n" +
+            paragraph "Version 5.0.0\n\n" +
+            "If you like this app, please support the developer via PayPal:\n\ndonate@SmartTiles.click\n\n" +
             "Copyright © 2014 Alex Malikov"
-			href url:"http://action-dashboard.github.io", style:"embedded", required:false, title:"More information...", description:"http://action-dashboard.github.io"
+			href url:"http://SmartTiles.click/info", style:"embedded", required:false, title:"More information...", description:"http://SmartTiles.click/info"
         }
 		
 		section("Things...") {
@@ -73,36 +73,36 @@ preferences {
 def controlThings() {
 	dynamicPage(name: "controlThings", title: "Things", install: false) {
 		section("Control these lights...") {
-			input "lights", "capability.switch", title: "Which Lights?", multiple: true, required: false
-			input "switches", "capability.switch", title: "Which Switches?", multiple: true, required: false
-			input "dimmerLights", "capability.switchLevel", title: "Which Dimmable Lights?", multiple: true, required: false
-			input "dimmers", "capability.switchLevel", title: "Which Dimmable Switches?", multiple: true, required: false
-			input "momentaries", "capability.momentary", title: "Which Momentary Switches?", multiple: true, required: false
-			input "themeLights", "capability.switch", title: "Which Theme Lights?", multiple: true, required: false
+			input "lights", "capability.switch", title: "Select Lights...", multiple: true, required: false
+			input "dimmerLights", "capability.switchLevel", title: "Select Dimmable Lights...", multiple: true, required: false
+			input "switches", "capability.switch", title: "Select Switches...", multiple: true, required: false
+			input "dimmers", "capability.switchLevel", title: "Select Dimmable Switches...", multiple: true, required: false
+			input "momentaries", "capability.momentary", title: "Select Momentary Switches...", multiple: true, required: false
+			input "themeLights", "capability.switch", title: "Select Theme Lights...", multiple: true, required: false
 		}
 		
 		section("Control these thermostats...") {
-			input "thermostatsHeat", "capability.thermostat", title: "Which Heating Thermostats?", multiple: true, required: false
-			input "thermostatsCool", "capability.thermostat", title: "Which Cooling Thermostats?", multiple: true, required: false
+			input "thermostatsHeat", "capability.thermostat", title: "Select Heating Thermostats...", multiple: true, required: false
+			input "thermostatsCool", "capability.thermostat", title: "Select Cooling Thermostats...", multiple: true, required: false
 		}
 		
 		section("Control these things...") {
-			input "locks", "capability.lock", title: "Which Locks?", multiple: true, required: false
-			input "camera", "capability.imageCapture", title: "Which Cameras (Image Capture)?", multiple: true, required: false
+			input "locks", "capability.lock", title: "Select Locks...", multiple: true, required: false
 			input "music", "capability.musicPlayer", title: "Which Music Players?", multiple: true, required: false
+			input "camera", "capability.imageCapture", title: "Select Cameras (Image Capture)...", multiple: true, required: false
 		}
 		
 		section("View state of these things...") {
-            input "contacts", "capability.contactSensor", title: "Which Contact?", multiple: true, required: false
-            input "presence", "capability.presenceSensor", title: "Which Presence?", multiple: true, required: false
-            input "temperature", "capability.temperatureMeasurement", title: "Which Temperature?", multiple: true, required: false
-            input "humidity", "capability.relativeHumidityMeasurement", title: "Which Hygrometer?", multiple: true, required: false
-            input "motion", "capability.motionSensor", title: "Which Motion?", multiple: true, required: false
-            input "water", "capability.waterSensor", title: "Which Water Sensors?", multiple: true, required: false
-            input "battery", "capability.battery", title: "Which Battery Status?", multiple: true, required: false
-            input "energy", "capability.energyMeter", title: "Which Energy Meters?", multiple: true, required: false
-            input "power", "capability.powerMeter", title: "Which Power Meters?", multiple: true, required: false
-            input "weather", "device.smartweatherStationTile", title: "Which Weather?", multiple: true, required: false
+            input "contacts", "capability.contactSensor", title: "Select Contact...", multiple: true, required: false
+            input "presence", "capability.presenceSensor", title: "Select Presence...", multiple: true, required: false
+            input "temperature", "capability.temperatureMeasurement", title: "Select Temperature...", multiple: true, required: false
+            input "motion", "capability.motionSensor", title: "Select Motion Sensors...", multiple: true, required: false
+            input "humidity", "capability.relativeHumidityMeasurement", title: "Select Hygrometer...", multiple: true, required: false
+            input "water", "capability.waterSensor", title: "Select Water Sensors...", multiple: true, required: false
+            input "battery", "capability.battery", title: "Select Battery Status...", multiple: true, required: false
+            input "energy", "capability.energyMeter", title: "Select Energy Meters...", multiple: true, required: false
+            input "power", "capability.powerMeter", title: "Select Power Meters...", multiple: true, required: false
+            input "weather", "device.smartweatherStationTile", title: "Select Weather...", multiple: true, required: false
         }
 	}
 }
@@ -111,7 +111,7 @@ def videoStreams() {
 	dynamicPage(name: "videoStreams", title: "Video Streams", install: false) {
 		section("About") {
 			paragraph "Enter absolute URL of the stream starting with http..."
-			href url:"http://action-dashboard.github.io", style:"embedded", required:false, title:"More information..."
+			href url:"http://SmartTiles.click/video", style:"embedded", required:false, title:"More information..."
 		}
 		
 		(1..10).each{
@@ -183,17 +183,20 @@ def dashboards() {
 
 def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
-		section("Preferences...") {
+		section() {
 			label title: "Title", required: false, defaultValue: "ActiON 5.0.0"
-			input "theme", title: "Theme", "enum", multiple: false, required: true, options: ["": "Jasper (default)", slate: "Slate", quartz: "Quartz"]
+		}
+		
+		section() {
+			input "theme", title: "Theme", "enum", multiple: false, required: true, options: [default: "Jasper (default)", slate: "Slate", quartz: "Quartz"]
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Small", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
-			paragraph ""
 			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: false
-			paragraph ""
-			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
-			paragraph ""
 			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
+		}
+		
+		section() {
+			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
 		}
 		
 		section("More Tiles...") {
