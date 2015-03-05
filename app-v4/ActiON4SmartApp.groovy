@@ -738,34 +738,34 @@ def renderTile(data) {
 
 def getTileIcons() {
 	[
-		dimmer : [off : "<i class='inactive fa fa-fw fa-toggle-off'></i>", on : "<i class='active fa fa-fw fa-toggle-on'></i>"],
-		dimmerLight : [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>"],
-		switch : [off : "<i class='inactive fa fa-fw fa-toggle-off'></i>", on : "<i class='active fa fa-fw fa-fw fa-toggle-on'></i>"],
-		light : [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>"],
-		lock : [locked : "<i class='inactive fa fa-fw fa-lock'></i>", unlocked : "<i class='active fa fa-fw fa-unlock-alt'></i>"],
-		motion : [active : "<i class='active fa fa-fw fa-exchange'></i>", inactive: "<i class='inactive opaque fa fa-fw fa-exchange'></i>"],
-		presence : [present : "<i class='active fa fa-fw fa-map-marker'></i>", notPresent: "<i class='inactive opaque fa fa-fw fa-map-marker'></i>"],
-		contact : [open : "<i class='active r45 fa fa-fw fa-expand'></i>", closed: "<i class='inactive r45 fa fa-fw fa-compress'></i>"],
-		water : [dry : "<i class='inactive fa fa-fw fa-tint'></i>", wet: "<i class='active fa fa-fw fa-tint'></i>"],
-		momentary : "<i class='fa fa-fw fa-circle-o'></i>",
-		camera : "<i class='fa fa-fw fa-camera'></i>",
-		refresh : "<i class='fa fa-fw fa-refresh'></i>",
-		humidity : "<i class='fa fa-fw wi wi-sprinkles'></i>",
-		temperature : "<i class='fa fa-fw wi wi-thermometer'></i>",
-		energy : "<i class='fa fa-fw wi wi-lightning'></i>",
-		power : "<i class='fa fa-fw fa-bolt'></i>",
-		battery : "<i class='fa fa-fw fa-fw batt'></i>",
-        "hello-home" : "<i class='fa fa-fw fa-comment-o'></i>",
-        link : "<i class='fa fa-fw fa-link'></i>",
-        dashboard : "<i class='fa fa-fw fa-th'></i>",
-        thermostatHeat : "<i class='fa fa-fw fa-fire'></i>",
-        thermostatCool : "<i class='fa fa-fw wi wi-snow'></i>",
+		dimmer : [off : "<i class='inactive fa fa-fw fa-toggle-off st-switch-off'></i>", on : "<i class='active fa fa-fw fa-toggle-on st-switch-on'></i>"],
+		dimmerLight : [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o st-light-off'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o st-light-on'></i>"],
+		switch : [off : "<i class='inactive fa fa-fw fa-toggle-off st-switch-off'></i>", on : "<i class='active fa fa-fw fa-fw fa-toggle-on st-switch-on'></i>"],
+		light : [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o st-light'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o st-light-on'></i>"],
+		lock : [locked : "<i class='inactive fa fa-fw fa-lock st-lock'></i>", unlocked : "<i class='active fa fa-fw fa-unlock-alt st-unlock'></i>"],
+		motion : [active : "<i class='active fa fa-fw fa-exchange st-motion-active'></i>", inactive: "<i class='inactive opaque fa fa-fw fa-exchange st-motion-inactive'></i>"],
+		presence : [present : "<i class='active fa fa-fw fa-map-marker st-present'></i>", notPresent: "<i class='inactive opaque fa fa-fw fa-map-marker st-not-present'></i>"],
+		contact : [open : "<i class='active r45 fa fa-fw fa-expand st-opened'></i>", closed: "<i class='inactive r45 fa fa-fw fa-compress st-closed'></i>"],
+		water : [dry : "<i class='inactive opaque fa fa-fw fa-tint st-dry'></i>", wet: "<i class='active fa fa-fw fa-tint st-wet'></i>"],
+		momentary : "<i class='fa fa-fw fa-circle-o st-momentary'></i>",
+		camera : "<i class='fa fa-fw fa-camera st-camera'></i>",
+		refresh : "<i class='fa fa-fw fa-refresh st-refresh'></i>",
+		humidity : "<i class='fa fa-fw wi wi-sprinkles st-humidity'></i>",
+		temperature : "<i class='fa fa-fw wi wi-thermometer st-temperature'></i>",
+		energy : "<i class='fa fa-fw wi wi-lightning st-energy'></i>",
+		power : "<i class='fa fa-fw fa-bolt st-power'></i>",
+		battery : "<i class='fa fa-fw fa-fw batt st-battery'></i>",
+        "hello-home" : "<i class='fa fa-fw fa-comment-o st-hello-home'></i>",
+        link : "<i class='fa fa-fw fa-link st-link'></i>",
+        dashboard : "<i class='fa fa-fw fa-th st-dashboard'></i>",
+        thermostatHeat : "<i class='fa fa-fw fa-fire st-heat'></i>",
+        thermostatCool : "<i class='fa fa-fw wi wi-snow st-cool'></i>",
 		themeLight: getThemeLightIcon(),
-		clock: """<i class="fa fa-fw fa-clock-o"></i>""",
-		mode: """<i class="fa fa-fw fa-gear"></i>""",
-		weather: """<i class="fa fa-fw wi wi-day-rain-mix"></i>""",
-		music: """<i class="fa fa-fw fa-music"></i>""",
-		video: """<i class="fa fa-fw fa-video-camera"></i>""",
+		clock: """<i class="fa fa-fw fa-clock-o st-clock"></i>""",
+		mode: """<i class="fa fa-fw fa-gear st-mode"></i>""",
+		weather: """<i class="fa fa-fw wi wi-day-rain-mix st-weather"></i>""",
+		music: """<i class="fa fa-fw fa-music st-music"></i>""",
+		video: """<i class="fa fa-fw fa-video-camera st-video"></i>""",
 	]
 }
 
@@ -789,10 +789,10 @@ def getListIcon(type) {
 
 def getThemeLightIcon() {
 	def icons = [
-	"Valentine's Day" : [on : "<i class='active fa fa-fw fa-heart'></i>", off : "<i class='inactive fa fa-fw fa-heart-o'></i>", css: ".themeLight {background-color: #FF82B2;} /*pink*/ .themeLight.active {background-color: #A90000} .themeLight.active .icon i {color:#EA001F}"],
-	"Christmas" : [on: "<i class='active fa fa-fw fa-tree'></i>", off: "<i class='inactive fa fa-fw fa-tree'></i>", css: ".themeLight {background-color: #11772D;} /*green*/ .themeLight.active {background-color: #AB0F0B} .themeLight.active .icon i {color:#11772D}"],
+	"Valentine's Day" : [on : "<i class='active fa fa-fw fa-heart st-valentines-on'></i>", off : "<i class='inactive fa fa-fw fa-heart-o st-valentines-off'></i>", css: ".themeLight {background-color: #FF82B2;} /*pink*/ .themeLight.active {background-color: #A90000} .themeLight.active .icon i {color:#EA001F}"],
+	"Christmas" : [on: "<i class='active fa fa-fw fa-tree st-christmas-on'></i>", off: "<i class='inactive fa fa-fw fa-tree st-christmas-off'></i>", css: ".themeLight {background-color: #11772D;} /*green*/ .themeLight.active {background-color: #AB0F0B} .themeLight.active .icon i {color:#11772D}"],
     ]
-	icons[themeLightType] ?: [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o'></i>", css : ""]
+	icons[themeLightType] ?: [off : "<i class='inactive opaque fa fa-fw fa-lightbulb-o st-light-off'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o st-light-on'></i>", css : ""]
 }
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
