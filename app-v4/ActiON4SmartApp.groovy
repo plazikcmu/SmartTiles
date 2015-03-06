@@ -38,24 +38,28 @@ preferences {
             paragraph "Version ${appVersion()}\n\n" +
             "If you like this app, please support the developer via PayPal:\n\ndonate@SmartTiles.click\n\n" +
             "Copyright © 2014 Alex Malikov"
-			href url:"http://SmartTiles.click", style:"embedded", required:false, title:"More information...", description:"http://SmartTiles.click"
+			href url:"http://SmartTiles.click", style:"embedded", required:false, title:"More information...", description:"www.SmartTiles.click"
         }
 		
-		section("Things...") {
+		section() {
 			href "controlThings", title:"View and control these things"
 		}
 		
-        section("Video Streams...") {
-			href "videoStreams", title:"Configure Dropcam video streams"
-			href "videoStreamsMJPEG", title:"Configure generic MJPEG video streams", description: "Foscam, Blue Iris, etc"
+        section() {
+			href "videoStreams", title:"Dropcam video streams"
+			href "videoStreamsMJPEG", title:"Generic MJPEG video streams", description: "Foscam, Blue Iris, etc"
 		}
 		
-		section("Shortcuts...") {
-			href "dashboards", title:"Link other dashboards"
-			href "links", title:"Configure shortcuts"
+		section() {
+			href "dashboards", title: "Links to other dashboards"
+			href "links", title: "Links to other websites"
 		}
 		
-		section("More Tiles and Preferences...") {
+		section() {
+			href "moretiles", title: "More tiles"
+		}
+		
+		section() {
 			href "preferences", title: "Preferences"
 		}
     }
@@ -66,6 +70,7 @@ preferences {
 	page(name: "dashboards", title: "dashboards")
 	page(name: "links", title: "links")
 	page(name: "preferences", title: "preferences")
+	page(name: "moretiles", title: "moretiles")
 	page(name: "authenticationPreferences", title: "authenticationPreferences")
 	page(name: "viewURL", title: "viewURL")
 }
@@ -90,7 +95,7 @@ def controlThings() {
 		
 		section("Control these things...") {
 			input "locks", "capability.lock", title: "Locks...", multiple: true, required: false
-			input "music", "capability.musicPlayer", title: "Which Music Players?", multiple: true, required: false
+			input "music", "capability.musicPlayer", title: "Music Players...", multiple: true, required: false
 			input "camera", "capability.imageCapture", title: "Cameras (Image Capture)...", multiple: true, required: false
 		}
 		
@@ -113,7 +118,7 @@ def videoStreams() {
 	dynamicPage(name: "videoStreams", title: "Video Streams", install: false) {
 		section("About") {
 			paragraph "Enter absolute URL of the stream starting with http..."
-			href url:"http://SmartTiles.click/video", style:"embedded", required:false, title:"More information..."
+			href url:"http://SmartTiles.click/video", style:"embedded", required:false, title: "More information...", description:"www.SmartTiles.click/video"
 		}
 		
 		(1..10).each{
@@ -134,7 +139,7 @@ def videoStreamsMJPEG() {
 			paragraph "For Foscam cameras use http://DOMAIN:PORT/videostream.cgi?&user=USERNAME&pwd=PASSWORD"
 			paragraph "For BlueIris cameras use http://blueirisserver/mjpg/CAMERASHORTNAME/video.mjpeg"
 			paragraph "Feel free to try other links for MJPEG Video Streams, your experience may vary.\n\nThere may be issues displaying these video streams using Chrome in iOS."
-			href url:"http://action-dashboard.github.io", style:"embedded", required:false, title:"More information..."
+			href url:"http://SmartTiles.click/video", style:"embedded", required:false, title:"More information...", description:"www.SmartTiles.click/video"
 		}
 		
 		(1..10).each{
@@ -183,28 +188,35 @@ def dashboards() {
 	}
 }
 
+def moretiles() {
+	dynamicPage(name: "moretiles", title: "More Tiles", install: false) {
+		section() {
+			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
+			input "showHelloHome", title: "Hello, Home! Actions", "bool", required: true, defaultValue: true
+			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
+		}
+	}
+}
+
 def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section() {
-			label title: "Title", required: false, defaultValue: "ActiON ${appVersion()}"
+			label title: "Title", required: false, defaultValue: "$location?.name Dashboard"
 		}
 		
 		section() {
 			input "theme", title: "Theme", "enum", multiple: false, required: true, options: [default: "Metro (default)", slate: "Slate", quartz: "Quartz", onyx: "Onyx"]
-			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Small", options: ["Small", "Medium", "Large"]
+			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Medium", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
 			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: false
+		}
+		
+		section() {
 			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
 		}
 		
 		section() {
 			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
-		}
-		
-		section("More Tiles...") {
-			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
-			input "showHelloHome", title: "Hello, Home! Actions", "bool", required: true, defaultValue: true
-			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
 		}
 		
 		if (state) {
@@ -227,7 +239,7 @@ def authenticationPreferences() {
 		}
 		section("Reset Access Token...") {
         	paragraph "Activating this option will invalidate access token. Access to all authenticated instances of this dashboard will be permanently revoked."
-        	input "resetOauth", "bool", title: "Reset Access Token?", defaultValue: false
+        	input "resetOauth", "bool", title: "Reset access token?", defaultValue: false
         }
 	}
 }
