@@ -79,7 +79,7 @@ def appVersion() {"5.0.0"}
 
 def controlThings() {
 	dynamicPage(name: "controlThings", title: "Things", install: false) {
-		section("Control these lights...") {
+		section("Control lights...") {
 			input "lights", "capability.switch", title: "Lights...", multiple: true, required: false
 			input "dimmerLights", "capability.switchLevel", title: "Dimmable Lights...", multiple: true, required: false
 			input "switches", "capability.switch", title: "Switches...", multiple: true, required: false
@@ -88,18 +88,18 @@ def controlThings() {
 			input "themeLights", "capability.switch", title: "Theme Lights...", multiple: true, required: false
 		}
 		
-		section("Control these thermostats...") {
+		section("Control thermostats...") {
 			input "thermostatsHeat", "capability.thermostat", title: "Heating Thermostats...", multiple: true, required: false
 			input "thermostatsCool", "capability.thermostat", title: "Cooling Thermostats...", multiple: true, required: false
 		}
 		
-		section("Control these things...") {
+		section("Control things...") {
 			input "locks", "capability.lock", title: "Locks...", multiple: true, required: false
 			input "music", "capability.musicPlayer", title: "Music Players...", multiple: true, required: false
 			input "camera", "capability.imageCapture", title: "Cameras (Image Capture)...", multiple: true, required: false
 		}
 		
-		section("View state of these things...") {
+		section("View state of things...") {
             input "presence", "capability.presenceSensor", title: "Presence Sensors...", multiple: true, required: false
             input "contacts", "capability.contactSensor", title: "Contact Sensors...", multiple: true, required: false
             input "motion", "capability.motionSensor", title: "Motion Sensors...", multiple: true, required: false
@@ -205,7 +205,7 @@ def preferences() {
 		}
 		
 		section() {
-			input "theme", title: "Theme", "enum", multiple: false, required: true, options: [default: "Metro (default)", slate: "Slate", quartz: "Quartz", onyx: "Onyx"]
+			input "theme", title: "Theme", "enum", multiple: false, required: true, defaultValue: "default", options: [default: "Metro (default)", slate: "Slate", quartz: "Quartz", onyx: "Onyx"]
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Medium", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
 			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: false
