@@ -20,7 +20,7 @@
  *
  */
 definition(
-    name: "ActiON5",
+    name: "ActiON Dashboard 5.0.0 (WS)",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
@@ -216,7 +216,7 @@ def preferences() {
 		}
 		
 		section() {
-			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, options: ["Default", "Christmas", "Valentine's Day"]
+			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, defaultValue: "Default", options: ["Default", "Christmas", "Valentine's Day"]
 		}
 		
 		if (state) {
