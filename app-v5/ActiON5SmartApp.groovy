@@ -20,7 +20,7 @@
  *
  */
 definition(
-    name: "ActiON Dashboard 5.0.0",
+    name: "ActiON Dashboard ${appVersion()}",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "ActiON Dashboard, a SmartThings web client.",
@@ -42,21 +42,19 @@ preferences {
         }
 		
 		section() {
-			href "controlThings", title:"View and control these things"
+			href "controlThings", title:"Things"
 		}
 		
         section() {
-			href "videoStreams", title:"Dropcam video streams"
-			href "videoStreamsMJPEG", title:"Generic MJPEG video streams", description: "Foscam, Blue Iris, etc"
+			href "videos", title:"Video Streams"
 		}
 		
 		section() {
-			href "dashboards", title: "Links to other dashboards"
-			href "links", title: "Links to other websites"
+			href "shortcuts", title:"Shortcuts"
 		}
 		
 		section() {
-			href "moretiles", title: "More tiles"
+			href "moretiles", title: "Other Tiles"
 		}
 		
 		section() {
@@ -65,8 +63,10 @@ preferences {
     }
 	
 	page(name: "controlThings", title: "controlThings")
+	page(name: "videos", title: "videos")
 	page(name: "videoStreams", title: "videoStreams")
 	page(name: "videoStreamsMJPEG", title: "videoStreamsMJPEG")
+	page(name: "shortcuts", title: "shortcuts")
 	page(name: "dashboards", title: "dashboards")
 	page(name: "links", title: "links")
 	page(name: "preferences", title: "preferences")
@@ -114,11 +114,26 @@ def controlThings() {
 	}
 }
 
+def videos() {
+	dynamicPage(name: "videos", title: "Video Streams", install: false) {
+		section() {
+			href url:"http://www.smarttiles.click/info/#video", style:"embedded", required:false, title:"More information...", description:"www.smarttiles.click/info/#video"
+		}
+		
+		section() {
+			href "videoStreams", title:"Dropcam video streams"
+		}
+		
+		section() {
+			href "videoStreamsMJPEG", title:"Generic MJPEG video streams", description: "Foscam, Blue Iris, etc"
+		}
+	}
+}
+
 def videoStreams() {
 	dynamicPage(name: "videoStreams", title: "Video Streams", install: false) {
 		section("About") {
 			paragraph "Enter absolute URL of the stream starting with http..."
-			href url:"http://SmartTiles.click/video", style:"embedded", required:false, title: "More information...", description:"www.SmartTiles.click/video"
 		}
 		
 		(1..10).each{
@@ -139,7 +154,6 @@ def videoStreamsMJPEG() {
 			paragraph "For Foscam cameras use http://DOMAIN:PORT/videostream.cgi?&user=USERNAME&pwd=PASSWORD"
 			paragraph "For BlueIris cameras use http://blueirisserver/mjpg/CAMERASHORTNAME/video.mjpeg"
 			paragraph "Feel free to try other links for MJPEG Video Streams, your experience may vary.\n\nThere may be issues displaying these video streams using Chrome in iOS."
-			href url:"http://SmartTiles.click/video", style:"embedded", required:false, title:"More information...", description:"www.SmartTiles.click/video"
 		}
 		
 		(1..10).each{
@@ -153,8 +167,20 @@ def videoStreamsMJPEG() {
 	}
 }
 
-def links() {
+def shortcuts() {
 	dynamicPage(name: "links", title: "Shortcuts", install: false) {
+		section() {
+			href "dashboards", title: "Links to other dashboards"
+		}
+		
+		section() {
+			href "links", title: "Links to other websites"
+		}
+	}
+}
+
+def links() {
+	dynamicPage(name: "links", title: "Links", install: false) {
 		section() {
 			paragraph "Enter absolute URL starting with http..."
 		}
@@ -314,7 +340,7 @@ def command() {
 	def device
 
 	if (type == "thermostatHeat" || type == "thermostatCool") {
-		def deviceSet = (type == "thermostatHeat" ? thermostatsHeat : thermostatCool)
+		def deviceSet = (type == "thermostatHeat" ? thermostatsHeat : thermostatsCool)
 		device = deviceSet?.find{it.id == id}
 		value = value.toInteger()
 		if (device) {
@@ -363,7 +389,6 @@ def command() {
     	location.helloHome.execute(command)
     } else if (type == "momentary") {
     	momentaries?.find{it.id == id}?.push()
-		updateStateTS()
     } else if (type == "camera") {
     	camera?.find{it.id == id}.take()
     } else if (type == "music") {
@@ -395,13 +420,18 @@ def installed() {
 
 def updated() {
 	log.debug "Updated with settings: ${settings}"
-	unsubscribe()
 	initialize()
 }
 
 def initialize() {
-    scheduledWeatherRefresh()
-    sendURL_SMS("ui")
+	unsubscribe()
+	unschedule()
+	
+    weatherRefresh()
+	runEvery15Minutes(updateStateTS)
+	runEvery30Minutes(weatherRefresh)
+    
+	sendURL_SMS("ui")
 	
 	updateStateTS()
 	
@@ -447,6 +477,11 @@ def initialize() {
 	subscribe(thermostatsCool, "thermostatOperatingState", handler, [filterEvents: false])
 }
 
+def weatherRefresh() {
+	log.debug "refreshing weather"
+	weather?.refresh()
+}
+
 def sendURL_SMS(path) {
 	generateURL(path)
 	if (state.accessToken) {
@@ -476,12 +511,6 @@ def generateURL(path) {
 	}
 	
 	["https://graph.api.smartthings.com/api/smartapps/installations/${app.id}/$path", "?access_token=${state.accessToken}"]
-}
-
-def scheduledWeatherRefresh() {
-    runIn(3600, scheduledWeatherRefresh, [overwrite: false])
-	weather?.refresh()
-	updateStateTS()
 }
 
 def head() {
@@ -700,10 +729,7 @@ def getThermostatData(device, type) {
 	device?.supportedAttributes?.each{
 		try {
 			deviceData << [("$it" as String): device.currentValue("$it")]
-		} catch (e) {
-			log.error e
-			log.debug "$device has trouble reporting $it. Is value not set when integer is expected?"
-		}
+		} catch (e) {}
 	}
 	[tile: "device", type: type, device: device.id, name: device.displayName, humidity: deviceData.humidity, temperature: deviceData.temperature, thermostatFanMode: deviceData.thermostatFanMode, thermostatOperatingState: deviceData.thermostatOperatingState, setpoint: type == "thermostatHeat" ? deviceData.heatingSetpoint : deviceData.coolingSetpoint]
 }
@@ -846,11 +872,14 @@ def getDeviceValue(device, type) {
 def getDeviceLevel(device, type) {if (type == "dimmer" || type == "dimmerLight" || type == "music") return "${(device.currentValue("level") ?: 0) / 10.0}".toDouble().round() ?: 1}
 
 def handler(e) {
-	log.debug "event happened $e.description"
+	log.debug "event from: $e.displayName, value: $e.value, source: $e.source, description: $e.description"
 	updateStateTS()
 }
 
-def updateStateTS() {state.ts = now()}
+def updateStateTS() {
+	log.debug "updating TS"
+	state.ts = now()
+}
 
 def getStateTS() {state.ts}
 
