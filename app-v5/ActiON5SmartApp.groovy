@@ -4,7 +4,7 @@
  *  Visit Home Page for more information:
  *  http://action-dashboard.github.io/
  *
- *  If you like this app, please support the developer via PayPal: alex.smart.things@gmail.com
+ *  If you like this app, please support the developer via PayPal: donate@SmartTiles.click
  *
  *  This software if free for Private Use. You may use and modify the software without distributing it.
  *  
@@ -232,7 +232,7 @@ def preferences() {
 		}
 		
 		section() {
-			input "theme", title: "Theme", "enum", multiple: false, required: true, defaultValue: "default", options: [default: "Metro (default)", slate: "Slate", quartz: "Quartz", onyx: "Onyx"]
+			input "theme", title: "Theme", "enum", multiple: false, required: true, defaultValue: "default", options: [default: "Metro (default)", slate: "Slate", quartz: "Quartz", onyx: "Onyx", cobalt: "Cobalt"]
 			input "tileSize", title: "Tile Size", "enum", multiple: false, required: true, defaultValue: "Medium", options: ["Small", "Medium", "Large"]
 			input "fontSize", title: "Font Size", "enum", multiple: false, required: true, defaultValue: "Normal", options: ["Normal", "Larger", "Largest"]
 			input "dropShadow", title: "Drop Shadow", "bool", required: true, defaultValue: false
@@ -520,8 +520,8 @@ def head() {
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="icon" sizes="192x192" href="https://action-dashboard.github.io/icon.png">
-<link rel="apple-touch-icon" href="https://action-dashboard.github.io/icon.png">
+<link rel="icon" sizes="192x192" href="https://625alex.github.io/ActiON-Dashboard/prod/icon.png">
+<link rel="apple-touch-icon" href="https://625alex.github.io/ActiON-Dashboard/prod/icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <title>${app.label ?: location.name}</title>
 
