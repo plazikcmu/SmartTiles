@@ -1,5 +1,5 @@
 ﻿/**
- *  ActiON Dashboard 5.1.0
+ *  ActiON Dashboard 5.1.2
  *
  *  Visit Home Page for more information:
  *  http://action-dashboard.github.io/
@@ -75,7 +75,7 @@ preferences {
 	page(name: "viewURL", title: "viewURL")
 }
 
-def appVersion() {"5.1.0"}
+def appVersion() {"5.1.2"}
 
 def controlThings() {
 	dynamicPage(name: "controlThings", title: "Things", install: false) {
@@ -218,9 +218,9 @@ def moretiles() {
 	dynamicPage(name: "moretiles", title: "More Tiles", install: false) {
 		section() {
 			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
-			input "showHelloHome", title: "Hello, Home! Actions", "bool", required: true, defaultValue: true
+			input "showHelloHome", title: "Hello, Home!", "bool", required: true, defaultValue: true
 			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
-			input "showRefresh", title: "Refresh Button", "bool", required: true, defaultValue: true
+			input "showRefresh", title: "Refresh", "bool", required: true, defaultValue: true
 		}
 	}
 }
@@ -228,7 +228,7 @@ def moretiles() {
 def preferences() {
 	dynamicPage(name: "preferences", title: "Preferences", install: false) {
 		section() {
-			label title: "Title", required: false, defaultValue: "$location?.name Dashboard"
+			label title: "Title", required: false, defaultValue: "$location Dashboard"
 		}
 		
 		section() {
@@ -421,13 +421,13 @@ def installed() {
 
 def updated() {
 	log.debug "Updated with settings: ${settings}"
+	unsubscribe()
+	unschedule()
+	
 	initialize()
 }
 
 def initialize() {
-	unsubscribe()
-	unschedule()
-	
     weatherRefresh()
 	runEvery15Minutes(updateStateTS)
 	runEvery30Minutes(weatherRefresh)
@@ -721,7 +721,7 @@ def roundNumber(num) {
 def getWeatherData(device) {
 	def data = [tile:"device", active:"inactive", type: "weather", device: device.id, name: device.displayName]
     ["city", "weather", "feelsLike", "temperature", "localSunrise", "localSunset", "percentPrecip", "humidity", "weatherIcon"].each{data["$it"] = device?.currentValue("$it")}
-    data.icon = ["chanceflurries":"wi-snow","chancerain":"wi-rain","chancesleet":"wi-rain-mix","chancesnow":"wi-snow","chancetstorms":"wi-storm-showers","clear":"wi-day-sunny","cloudy":"wi-cloudy","flurries":"wi-snow","fog":"wi-fog","hazy":"wi-dust","mostlycloudy":"wi-cloudy","mostlysunny":"wi-day-sunny","partlycloudy":"wi-day-cloudy","partlysunny":"wi-day-cloudy","rain":"wi-rai","sleet":"wi-rain-mix","snow":"wi-snow","sunny":"wi-day-sunny","tstorms":"wi-storm-showers","nt_chanceflurries":"wi-snow","nt_chancerain":"wi-rain","nt_chancesleet":"wi-rain-mix","nt_chancesnow":"wi-snow","nt_chancetstorms":"wi-storm-showers","nt_clear":"wi-stars","nt_cloudy":"wi-cloudy","nt_flurries":"wi-snow","nt_fog":"wi-fog","nt_hazy":"wi-dust","nt_mostlycloudy":"wi-night-cloudy","nt_mostlysunny":"wi-night-cloudy","nt_partlycloudy":"wi-night-cloudy","nt_partlysunny":"wi-night-cloudy","nt_sleet":"wi-rain-mix","nt_rain":"wi-rain","nt_snow":"wi-snow","nt_sunny":"wi-night-clear","nt_tstorms":"wi-storm-showers","wi-horizon":"wi-horizon"][data.weatherIcon]
+    data.icon = ["chanceflurries":"wi-snow","chancerain":"wi-rain","chancesleet":"wi-rain-mix","chancesnow":"wi-snow","chancetstorms":"wi-storm-showers","clear":"wi-day-sunny","cloudy":"wi-cloudy","flurries":"wi-snow","fog":"wi-fog","hazy":"wi-dust","mostlycloudy":"wi-cloudy","mostlysunny":"wi-day-sunny","partlycloudy":"wi-day-cloudy","partlysunny":"wi-day-cloudy","rain":"wi-rain","sleet":"wi-rain-mix","snow":"wi-snow","sunny":"wi-day-sunny","tstorms":"wi-storm-showers","nt_chanceflurries":"wi-snow","nt_chancerain":"wi-rain","nt_chancesleet":"wi-rain-mix","nt_chancesnow":"wi-snow","nt_chancetstorms":"wi-storm-showers","nt_clear":"wi-stars","nt_cloudy":"wi-cloudy","nt_flurries":"wi-snow","nt_fog":"wi-fog","nt_hazy":"wi-dust","nt_mostlycloudy":"wi-night-cloudy","nt_mostlysunny":"wi-night-cloudy","nt_partlycloudy":"wi-night-cloudy","nt_partlysunny":"wi-night-cloudy","nt_sleet":"wi-rain-mix","nt_rain":"wi-rain","nt_snow":"wi-snow","nt_sunny":"wi-night-clear","nt_tstorms":"wi-storm-showers","wi-horizon":"wi-horizon"][data.weatherIcon]
 	data
 }
 

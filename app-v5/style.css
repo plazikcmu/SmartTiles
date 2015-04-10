@@ -1,4 +1,4 @@
-.version-5-0-0 {display: none}
+.version-5-1-0 {display: none}
 
 .tile {background-color: grey}
 .weather {background-color: #a20025;}
@@ -174,4 +174,4 @@ div.ui-slider{height:21px;}
 .theme-cobalt .ui-page-theme-a .ui-slider-track .ui-btn-active {background-color:white;}
 .theme-cobalt .ui-slider-handle.ui-btn.ui-shadow {background-color:white;}
 
-.theme-cobalt .tile.active .icon i.active {color: #61A3AF}
+.theme-cobalt .tile.active .icon i.active {color: #1175ff}
