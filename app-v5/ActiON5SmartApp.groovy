@@ -1,5 +1,5 @@
 ﻿/**
- *  ActiON Dashboard 5.1.2
+ *  ActiON Dashboard 5.2.0
  *
  *  Visit Home Page for more information:
  *  http://action-dashboard.github.io/
@@ -58,6 +58,10 @@ preferences {
 		}
 		
 		section() {
+			href "filterevents", title: "Event History"
+		}		
+		
+		section() {
 			href "preferences", title: "Preferences"
 		}
     }
@@ -71,6 +75,7 @@ preferences {
 	page(name: "links", title: "links")
 	page(name: "preferences", title: "preferences")
 	page(name: "moretiles", title: "moretiles")
+	page(name: "filterevents", title: "filterevents")
 	page(name: "authenticationPreferences", title: "authenticationPreferences")
 	page(name: "viewURL", title: "viewURL")
 }
@@ -221,6 +226,24 @@ def moretiles() {
 			input "showHelloHome", title: "Hello, Home!", "bool", required: true, defaultValue: true
 			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
 			input "showRefresh", title: "Refresh", "bool", required: true, defaultValue: true
+			input "showHistory", title: "Event History", "bool", required: true, defaultValue: true
+		}
+	}
+}
+
+def filterevents() {
+	dynamicPage(name: "filterevents", title: "Event Types to Show", install: false) {
+		section() {
+			input "showtemperature", title: "temperature", "bool", required: true, defaultValue: true
+			input "showacceleration", title: "acceleration", "bool", required: true, defaultValue: true
+			input "showstatus", title: "status", "bool", required: true, defaultValue: true
+			input "showcontact", title: "contact", "bool", required: true, defaultValue: true
+			input "showlock", title: "lock", "bool", required: true, defaultValue: true
+			input "showdoor", title: "door", "bool", required: true, defaultValue: true
+			input "showpresence", title: "presence", "bool", required: true, defaultValue: true
+			input "showmotion", title: "motion", "bool", required: true, defaultValue: true
+			input "showalarm", title: "alarm", "bool", required: true, defaultValue: true
+            input "showswitch", title: "switch", "bool", required: true, defaultValue: true
 		}
 	}
 }
@@ -241,6 +264,10 @@ def preferences() {
 		section() {
 			input "roundNumbers", title: "Round Off Decimals", "bool", required: true, defaultValue:true
 		}
+		
+		section() {
+			input "maxResults", title: "Max History Events Per Device", "int", required: true, defaultValue:50
+		}			
 		
 		section() {
 			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, defaultValue: "Default", options: ["Default", "Christmas", "Valentine's Day"]
@@ -302,6 +329,7 @@ mappings {
         path("/ping") {action: [GET: "oauthError"]}
         path("/link") {action: [GET: "oauthError"]}
         path("/list") {action: [GET: "oauthError"]}
+        path("/history") {action: [GET: "oauthError"]}
         path("/position") {action: [GET: "oauthError"]}
 	} else if (!params.access_token) {
 		path("/ui") {action: [GET: "html"]}
@@ -310,6 +338,7 @@ mappings {
         path("/ping") {action: [GET: "ping"]}
         path("/link") {action: [GET: "viewLinkError"]}
         path("/list") {action: [GET: "list"]}
+        path("/history") {action: [GET: "history"]}
 		path("/position") {action: [GET: "position"]}
 	} else {
         path("/ui") {action: [GET: "html"]}
@@ -318,6 +347,7 @@ mappings {
         path("/ping") {action: [GET: "ping"]}
         path("/link") {action: [GET: "link"]}
 		path("/list") {action: [GET: "list"]}
+		path("/history") {action: [GET: "history"]}
 		path("/position") {action: [GET: "position"]}
     }
 }
@@ -428,6 +458,7 @@ def updated() {
 }
 
 def initialize() {
+	
     weatherRefresh()
 	runEvery15Minutes(updateStateTS)
 	runEvery30Minutes(weatherRefresh)
@@ -586,6 +617,31 @@ def footer() {
 </script>"""
 }
 
+def headHistory() {
+"""
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title>${app.label ?: location.name} Event History</title>
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
+<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.${appVersion()}.min.css?u=0" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
+<script src="https://625alex.github.io/ActiON-Dashboard/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+<style>
+ul{list-style-type: none;padding-left:0;}
+* {color: white;font-size:16px;}
+.batt {background-size: 20px 20px;}
+.item {cursor:grab; padding:5px; margin:8px;border-radius:2px}
+.list {width: 100%; margin: 0 auto 60px auto;}
+.list i {margin-right:5px;}
+${getThemeLightIcon().css}
+</style>
+"""
+}  
+
 def headList() {
 """
 <meta charset="UTF-8" />
@@ -674,6 +730,12 @@ def getDate() {
     "${tf.format(new Date())}"
 }
 
+def formatDate(date) {
+	def tf = new java.text.SimpleDateFormat("M-d-yyyy h:mm:ss a")
+    if (location?.timeZone) tf.setTimeZone(location.timeZone)
+    return tf.format(date)
+}
+
 def getDOW() {
 	def tf = new java.text.SimpleDateFormat("EEEE")
     if (location?.timeZone) tf.setTimeZone(location.timeZone)
@@ -759,11 +821,9 @@ def renderTile(data) {
 	} else if (data.tile == "genericMJPEGvideo") {
 		return """<div class="video tile h2 w2" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><img src="$data.link" width="240" height="164"></object></div></div>"""
 	} else if (data.tile == "refresh") {
-		if (showRefresh) {
-			return """<div class="refresh tile clickable"><div class="title">Refresh</div><div class="footer">Updated $data.ts</div></div>"""
-		} else {
-			return ""
-		}
+		return """<div class="refresh tile clickable"><div class="title">Refresh</div><div class="footer">Updated $data.ts</div></div>"""
+	} else if (data.tile == "history") {
+		return """<div class="historyLink tile"><div class="title">Event History</div><div class="icon"><a href="${generateURL("history").join()}" data-ajax="false" style="color:white"><i class="fa fa-clock-o"></i></a></div></div>"""
 	} else if (data.tile == "mode") {
 		return renderModeTile(data)
 	} else if (data.tile == "clock") {
@@ -793,6 +853,7 @@ def getTileIcons() {
 		momentary : "<i class='fa fa-fw fa-circle-o st-momentary'></i>",
 		camera : "<i class='fa fa-fw fa-camera st-camera'></i>",
 		refresh : "<i class='fa fa-fw fa-refresh st-refresh'></i>",
+        history : "<i class='fa fa-fw fa-history st-history'></i>",		
 		humidity : "<i class='fa fa-fw wi wi-sprinkles st-humidity'></i>",
 		temperature : "<i class='fa fa-fw wi wi-thermometer st-temperature'></i>",
 		energy : "<i class='fa fa-fw wi wi-lightning st-energy'></i>",
@@ -830,6 +891,11 @@ def getListIcon(type) {
 	icons[type] ?: getTileIcons()[type]
 }
 
+def getEventIcon(type, value) {
+	""
+	//getTileIcons()[type][value]
+}
+
 def getThemeLightIcon() {
 	def icons = [
 	"Valentine's Day" : [on : "<i class='active fa fa-fw fa-heart st-valentines-on'></i>", off : "<i class='inactive fa fa-fw fa-heart-o st-valentines-off'></i>", css: ".themeLight {background-color: #FF82B2;} /*pink*/ .themeLight.active {background-color: #A90000} .themeLight.active .icon i {color:#EA001F}"],
@@ -838,7 +904,13 @@ def getThemeLightIcon() {
 	icons[themeLightType] ?: [off : "<i class='inactive fa fa-fw fa-lightbulb-o st-light-off'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o st-light-on'></i>", css : ""]
 }
 
+def shouldShowEvent(type) {
+	[temperature: showtemperature, acceleration: showacceleration, status: showstatus, contact: showcontact, lock: showlock, door: showdoor, presence: showpresence, motion: showmotion, alarm: showalarm, switch: showswitch][type]
+}
+
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
+
+def renderEvent(data) {return """<li class="item $data.name" data-type="$data.name">${formatDate(data.date)}<br/>${getEventIcon(data.name, data.value)} $data.descriptionText</li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -937,9 +1009,49 @@ def allDeviceData() {
 	(1..10).each{if (settings["linkUrl$it"]) {data << [tile: "link", device: "$it", link: settings["linkUrl$it"], name: settings["linkTitle$it"] ?: "Link $it", i: it, type: "link"]}}
 	(1..10).each{if (settings["dashboardUrl$it"]) {data << [tile: "dashboard", device: "$it", link: settings["dashboardUrl$it"], name: settings["dashboardTitle$it"] ?: "Dashboard $it", i: it, type: "dashboard"]}}
 	
-	data << refresh
+	if (showRefresh) data << refresh
+	if (showHistory) data << [tile: "history", name: "Event History", link: "/history", type: "link"]
 	
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
+}
+
+def getAllDevices() {
+	def devices = [] << lights << dimmerLights << switches << dimmers << momentaries << themeLights << thermostatsHeathermostatsCoolocks << music << camera << presence << contacts << motion << temperature << humidity << water << battery << energy << power << weather
+	devices?.flatten()?.findAll{it}
+}
+
+def getAllDeviceEvents() {
+	def data = []
+	/*
+	locks?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	thermostatsHeat?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	thermostatsCool?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	music?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	switches?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	lights?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	themeLights?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	dimmers?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	dimmerLights?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	momentaries?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	contacts?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	presence?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	motion?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	camera?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	temperature?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	humidity?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	water?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	energy?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	power?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+	battery?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
+    */
+	
+	def events = []
+	log.debug "all devices: ${getAllDevices()}"
+	getAllDevices()?.each{events << it.events(max:maxResults)}
+	
+	events = events?.flatten()?.sort{it.date}?.reverse()
+	log.debug "all events: $events"
+	events
 }
 
 def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
@@ -951,6 +1063,8 @@ def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head
 <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} Dashboard URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body style='background-color:black; color: white'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
+
+def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body style='background-color:black; color: white'><ul class="list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
 
 def customCSS() {
 """

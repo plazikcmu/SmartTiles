@@ -12,7 +12,7 @@ $(function() {
     
 	startTime();
 	
-	$(".dashboard").click(function(e) {
+	$(".dashboard, .historyLink").click(function(e) {
 		animateClick($(this));
 		e.stopImmediatePropagation();
 		e.preventDefault();
