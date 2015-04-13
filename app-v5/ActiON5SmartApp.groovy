@@ -266,7 +266,8 @@ def preferences() {
 		}
 		
 		section() {
-			input "maxResults", title: "Max History Events Per Device", "int", required: true, defaultValue:50
+			input "historyDuration", title: "Event History Period (days)", "int", required: true, defaultValue: 2
+			input "maxResults", title: "Maximum History Events Per Device", "int", required: true, defaultValue: 10
 		}			
 		
 		section() {
@@ -731,7 +732,7 @@ def getDate() {
 }
 
 def formatDate(date) {
-	def tf = new java.text.SimpleDateFormat("M-d-yyyy h:mm:ss a")
+	def tf = new java.text.SimpleDateFormat("h:mm:ss a, dd MMMMM yyyy ")
     if (location?.timeZone) tf.setTimeZone(location.timeZone)
     return tf.format(date)
 }
@@ -910,7 +911,7 @@ def shouldShowEvent(type) {
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.name" data-type="$data.name">${formatDate(data.date)}<br/>${getEventIcon(data.name, data.value)} $data.descriptionText</li>"""}
+def renderEvent(data) {return """<li class="item $data.name" data-name="$data.name" data-value="$data.value"><span style=" white-space: nowrap;">${formatDate(data.date)}</span>   <span style=" white-space: nowrap;">${getEventIcon(data.name, data.value)} $data.descriptionText</span></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1045,11 +1046,28 @@ def getAllDeviceEvents() {
 	battery?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
     */
 	
-	def events = []
-	log.debug "all devices: ${getAllDevices()}"
-	getAllDevices()?.each{events << it.events(max:maxResults)}
-	
-	events = events?.flatten()?.sort{it.date}?.reverse()
+	def events = getAllDevices()?.collect{it.eventsSince(new Date() - (historyDuration ?: 2), [max: (maxResults ?: 10)])}?.flatten()?.findAll{"$it.source" == "DEVICE"}?.sort{it.date}?.reverse()
+	events.each{
+		log.debug "############"
+		log.debug "event $it"
+		def event = [:]
+		def e = it
+		event.displayName = e.displayName
+		event.name = e.name
+		event.value = e.value
+		event.locationId = e.locationId
+		event.deviceId = e.deviceId
+		event.isPhysical = e.isPhysical()
+		event.description = e.description
+		event.descriptionText = e.descriptionText
+		event.isoDate = e.isoDate
+		event.ts = e.date.getTime()
+		event.source = e.source
+		log.debug "api event: $event"
+		it.properties.each { prop, val ->
+			log.debug "------   $prop: $val"
+		}
+	}
 	log.debug "all events: $events"
 	events
 }
