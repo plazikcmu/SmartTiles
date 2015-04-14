@@ -1017,8 +1017,30 @@ def allDeviceData() {
 }
 
 def getAllDevices() {
-	def devices = [] << lights << dimmerLights << switches << dimmers << momentaries << themeLights << thermostatsHeathermostatsCoolocks << music << camera << presence << contacts << motion << temperature << humidity << water << battery << energy << power << weather
-	devices?.flatten()?.findAll{it}
+	//def devices = [] << lights << dimmerLights << switches << dimmers << momentaries << themeLights << thermostatsHeathermostatsCoolocks << music << camera << presence << contacts << motion << temperature << humidity << water << battery << energy << power << weather
+	
+	def deviceMap = [
+		switches: switches,
+		dimmers: dimmers,
+		momentaries: momentaries,
+		themeLights: themeLights,
+		thermostatsHeathermostatsCoolocks: thermostatsHeathermostatsCoolocks,
+		music: music,
+		camera: camera,
+		presence: presence,
+		contacts: contacts,
+		motion: motion,
+		temperature: temperature,
+		humidity: humidity,
+		water: water,
+		battery: battery,
+		energy: energy,
+		power: power,
+		weather: weather
+	]
+	
+	//devices?.flatten()?.findAll{it}
+	deviceMap?.values()?.flatten?.findAll{it}
 }
 
 def getAllDeviceEvents() {
