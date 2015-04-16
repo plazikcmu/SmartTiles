@@ -266,7 +266,7 @@ def preferences() {
 		}
 		
 		section() {
-			input "historyDuration", title: "Event History Period (days)", "int", required: true, defaultValue: 2
+			input "historyDuration", title: "Event History Period (days)", "int", required: true, defaultValue: 1
 			input "maxResults", title: "Maximum History Events Per Device", "int", required: true, defaultValue: 10
 		}			
 		
@@ -874,6 +874,32 @@ def getTileIcons() {
 	]
 }
 
+def getDeviceTypeEventsMap() {
+	[
+		dimmer : ["switch", "level"],
+		dimmerLight : ["switch", "level"],
+		switch : ["switch"],
+		light : ["switch"],
+		themeLight: ["switch"],
+		lock : ["lock"],
+		motion : ["motion"],
+		presence : ["presence"],
+		contact : ["presence"],
+		water : ["presence"],
+		momentary : "*",
+		camera : "*",
+		humidity : ["humidity"],
+		temperature : ["temperature"],
+		energy : ["energy"],
+		power : ["power"],
+		battery : ["battery"],
+        thermostatHeat : ["humidity", "temperature", "thermostatFanMode", "thermostatOperatingState", heatingSetpoint],
+        thermostatCool : ["humidity", "temperature", "thermostatFanMode", "thermostatOperatingState", coolingSetpoint],
+		weather: ["weather", "feelsLike", "temperature", "localSunrise", "localSunset", "percentPrecip", "humidity"],
+		music: ["status", "level", "trackDescription", "mute"]
+	]
+}
+
 def getListIcon(type) {
 	def icons = [
 		lock: getTileIcons().lock.locked,
@@ -1022,7 +1048,7 @@ def getAllDevices() {
 	def deviceMap = [
 		switches: switches,
 		dimmers: dimmers,
-		momentaries: momentaries,
+/*		momentaries: momentaries,
 		themeLights: themeLights,
 		thermostatsHeathermostatsCoolocks: thermostatsHeathermostatsCoolocks,
 		music: music,
@@ -1035,12 +1061,24 @@ def getAllDevices() {
 		water: water,
 		battery: battery,
 		energy: energy,
-		power: power,
+		power: power,*/
 		weather: weather
 	]
 	
+	def filteredEvents = []
+	deviceMap.each {type, devices ->
+		devices?.each{filteredEvents << findDeviceEvents(it, type)}
+	}
+	log.debug "filteredEvents $filteredEvents"
 	//devices?.flatten()?.findAll{it}
 	deviceMap?.values()?.flatten?.findAll{it}
+}
+
+def findDeviceEvents(device, type) {
+	def events = device.eventsSince(new Date() - (historyDuration ?: 1), [max: (maxResults ?: 10)])?.flatten()?.findAll{"$it.source" == "DEVICE"}?.sort{it.date}?.reverse()
+	log.debug "events from device $device, ($type): $events"
+	events?.findAll{it.name in getDeviceTypeEventsMap[type]}
+	log.debug "filtered events: $events"
 }
 
 def getAllDeviceEvents() {
@@ -1068,8 +1106,8 @@ def getAllDeviceEvents() {
 	battery?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
     */
 	
-	def events = getAllDevices()?.collect{it.eventsSince(new Date() - (historyDuration ?: 2), [max: (maxResults ?: 10)])}?.flatten()?.findAll{"$it.source" == "DEVICE"}?.sort{it.date}?.reverse()
-	events.each{
+	def events = getAllDevices()?.collect{it.eventsSince(new Date() - (historyDuration ?: 1), [max: (maxResults ?: 10)])}?.flatten()?.findAll{"$it.source" == "DEVICE"}?.sort{it.date}?.reverse()
+	/*events.each{
 		log.debug "############"
 		log.debug "event $it"
 		def event = [:]
@@ -1089,7 +1127,7 @@ def getAllDeviceEvents() {
 		it.properties.each { prop, val ->
 			log.debug "------   $prop: $val"
 		}
-	}
+	}*/
 	log.debug "all events: $events"
 	events
 }
