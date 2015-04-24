@@ -868,7 +868,7 @@ def getTileIcons() {
 		lock : [locked : "<i class='inactive fa fa-fw fa-lock st-lock'></i>", unlocked : "<i class='active fa fa-fw fa-unlock-alt st-unlock'></i>"],
 		motion : [active : "<i class='active fa fa-fw fa-exchange st-motion-active'></i>", inactive: "<i class='inactive fa fa-fw fa-exchange st-motion-inactive'></i>"],
 		acceleration : [active : "<i class='active fa fa-fw st-acceleration-active'>&#8779</i>", inactive: "<i class='inactive fa fa-fw st-acceleration-inactive'>&#8779</i>"],
-		presence : [present : "<i class='active fa fa-fw fa-map-marker st-present'></i>", notPresent: "<i class='inactive fa fa-fw fa-map-marker st-not-present'></i>"],
+		presence : [present : "<i class='active fa fa-fw fa-map-marker st-present'></i>", notPresent: "<i class='inactive fa fa-fw fa-map-marker st-not-present'></i>", "not present": "<i class='inactive fa fa-fw fa-map-marker st-not-present'></i>"],
 		contact : [open : "<i class='active r45 fa fa-fw fa-expand st-opened'></i>", closed: "<i class='inactive r45 fa fa-fw fa-compress st-closed'></i>"],
 		water : [dry : "<i class='inactive fa fa-fw fa-tint st-dry'></i>", wet: "<i class='active fa fa-fw fa-tint st-wet'></i>"],
 		momentary : "<i class='fa fa-fw fa-circle-o st-momentary'></i>",
@@ -915,8 +915,8 @@ def getListIcon(type) {
 }
 
 def getEventIcon(event) {
-	def eventValues = getTileIcons()[event.capability]
-	log.debug "eventValues for $event.capability: ${"$eventValues".replaceAll("<", "[")}"
+	def eventValues = getTileIcons()[event.deviceType]
+	log.debug "eventValues for $event.deviceType: ${"$eventValues".replaceAll("<", "[")}"
 	if (eventValues instanceof String) return eventValues
 	eventValues ? eventValues[event.value] : "[icon]"
 }
@@ -1077,7 +1077,7 @@ def filterEventsPerCapability(events, deviceType) {
 	//}
 	
 	if (events) events*.deviceType = deviceType
-	events?.findAll{it.name in acceptableEventsPerCapability[deviceType]}
+	"weather" == deviceType ? events : events?.findAll{it.name in acceptableEventsPerCapability[deviceType]}
 }
 
 def getAllDeviceEvents() {
