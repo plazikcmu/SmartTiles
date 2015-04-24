@@ -29,7 +29,7 @@ definition(
     iconX2Url: "https://625alex.github.io/SmartTiles/prod/icon.png",
     oauth: true)
 
-def appVersion() {"5.2.0"}
+def appVersion() {"5.3.0"}
 
 preferences {
 	page(name: "selectDevices", install: false, uninstall: true, nextPage: "nextPage") {
@@ -645,11 +645,11 @@ def headHistory() {
 <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css" />
-<link href="https://625alex.github.io/ActiON-Dashboard/prod/style.${appVersion()}.min.css?u=0" rel="stylesheet">
+<link href="https://625alex.github.io/SmartTiles/prod/style.${appVersion()}.min.css?u=0" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Mallanna' rel='stylesheet' type='text/css'>
 <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
-<script src="https://625alex.github.io/ActiON-Dashboard/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+<script src="https://625alex.github.io/SmartTiles/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
 <style>
 ul{list-style-type: none;padding-left:0;}
 * {color: white;font-size:16px;}
@@ -959,7 +959,7 @@ def shouldShowEvent(type) {
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.name" data-name="$data.name" data-value="$data.value"><span style=" white-space: nowrap;">${formatDate(data.date)}</span>   <span style=" white-space: nowrap;">${getEventIcon(data.name, data.value)} $data.descriptionText</span></li>"""}
+def renderEvent(data) {return """<li class="item $data.capability" data-name="$data.name" data-value="$data.value" data-event="$data"><span style=" white-space: nowrap;">${formatDate(data.date)}</span>   <span style=" white-space: nowrap;">${getEventIcon(data.name, data.value)}</span> <span style=" white-space: nowrap;">$data.displayName &#8594; $data.value${data.unit ?: ""}</span></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1066,94 +1066,78 @@ def allDeviceData() {
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
 }
 
-def getAllDevices() {
-	//def devices = [] << lights << dimmerLights << switches << dimmers << momentaries << themeLights << thermostatsHeathermostatsCoolocks << music << camera << presence << contacts << motion << temperature << humidity << water << battery << energy << power << weather
-	
-	def deviceMap = [
-		switches: switches,
-		dimmers: dimmers,
-/*		momentaries: momentaries,
-		themeLights: themeLights,
-		thermostatsHeathermostatsCoolocks: thermostatsHeathermostatsCoolocks,
-		music: music,
-		camera: camera,
-		presence: presence,
-		contacts: contacts,
-		motion: motion,
-		temperature: temperature,
-		humidity: humidity,
-		water: water,
-		battery: battery,
-		energy: energy,
-		power: power,*/
-		weather: weather
-	]
-	
-	def filteredEvents = []
-	deviceMap.each {type, devices ->
-		devices?.each{filteredEvents << findDeviceEvents(it, type)}
-	}
-	log.debug "filteredEvents $filteredEvents"
-	//devices?.flatten()?.findAll{it}
-	deviceMap?.values()?.flatten?.findAll{it}
+def getEventsOfDevice(device) {
+	device.eventsSince(new Date() - ((historyDuration ?: 1) as int), [max: ((maxResults ?: 3) as int)])?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
 }
 
-def findDeviceEvents(device, type) {
-	def events = device.eventsSince(new Date() - (historyDuration ?: 1), [max: (maxResults ?: 10)])?.flatten()?.findAll{"$it.source" == "DEVICE"}?.sort{it.date}?.reverse()
-	log.debug "events from device $device, ($type): $events"
-	events?.findAll{it.name in getDeviceTypeEventsMap[type]}
-	log.debug "filtered events: $events"
+def filterEventsPerCapability(events, capability) {
+	def acceptableEventsPerCapability = [
+		lights             : ["switch"],
+		dimmerLights       : ["switch", "level"],
+		switches           : ["switch"],
+		dimmers            : ["switch", "level"],
+		momentaries        : ["switch"],
+		themeLights        : ["switch"],
+		thermostatsHeat    : ["temperature", "heatingSetpoint", "thermostatFanMode", "thermostatOperatingState",],
+		thermostatsCool    : ["temperature", "coolingSetpoint", "thermostatFanMode", "thermostatOperatingState",],
+		locks              : ["lock"],
+		music              : ["status", "level", "trackDescription", "mute"],
+//		camera             : [],
+		presence           : ["presence"],
+		contacts           : ["contact"],
+		motion             : ["motion"],
+		temperature        : ["temperature"],
+		humidity           : ["humidity"],
+		water              : ["water"],
+		battery            : ["battery"],
+		energy             : ["energy"],
+		power              : ["power"],
+		acceleration       : ["acceleration"],
+		luminosity         : ["illuminance"],
+		weather            : ["*"],
+	]
+	/*events?.each{
+		log.debug "checking event $it for capability $capability | ${it.name in acceptableEventsPerCapability[capability]}"
+	}*/
+	if (events) events*.capability = capability
+	events?.findAll{it.name in acceptableEventsPerCapability[capability]}
 }
 
 def getAllDeviceEvents() {
-	def data = []
-	/*
-	locks?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	thermostatsHeat?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	thermostatsCool?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	music?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	switches?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	lights?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	themeLights?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	dimmers?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	dimmerLights?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	momentaries?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	contacts?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	presence?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	motion?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	camera?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	temperature?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	humidity?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	water?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	energy?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	power?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-	battery?.each{it.events(max:maxResults).each {if (shouldShowEvent(it.name) == true) {data << it}}}
-    */
+	def eventsPerCapability = [
+		lights             : lights                ?.collect{getEventsOfDevice(it)},
+		dimmerLights       : dimmerLights          ?.collect{getEventsOfDevice(it)},
+		switches           : switches              ?.collect{getEventsOfDevice(it)},
+		dimmers            : dimmers               ?.collect{getEventsOfDevice(it)},
+		momentaries        : momentaries           ?.collect{getEventsOfDevice(it)},
+		themeLights        : themeLights           ?.collect{getEventsOfDevice(it)},
+		thermostatsHeat    : thermostatsHeat       ?.collect{getEventsOfDevice(it)},
+		thermostatsCool    : thermostatsCool       ?.collect{getEventsOfDevice(it)},
+		locks              : locks                 ?.collect{getEventsOfDevice(it)},
+		music              : music                 ?.collect{getEventsOfDevice(it)},
+		camera             : camera                ?.collect{getEventsOfDevice(it)},
+		presence           : presence              ?.collect{getEventsOfDevice(it)},
+		contacts           : contacts              ?.collect{getEventsOfDevice(it)},
+		motion             : motion                ?.collect{getEventsOfDevice(it)},
+		temperature        : temperature           ?.collect{getEventsOfDevice(it)},
+		humidity           : humidity              ?.collect{getEventsOfDevice(it)},
+		water              : water                 ?.collect{getEventsOfDevice(it)},
+		battery            : battery               ?.collect{getEventsOfDevice(it)},
+		energy             : energy                ?.collect{getEventsOfDevice(it)},
+		power              : power                 ?.collect{getEventsOfDevice(it)},
+		acceleration       : acceleration          ?.collect{getEventsOfDevice(it)},
+		luminosity         : luminosity            ?.collect{getEventsOfDevice(it)},
+		weather            : weather               ?.collect{getEventsOfDevice(it)},
+	]
 	
-	def events = getAllDevices()?.collect{it.eventsSince(new Date() - (historyDuration ?: 1), [max: (maxResults ?: 10)])}?.flatten()?.findAll{"$it.source" == "DEVICE"}?.sort{it.date}?.reverse()
-	/*events.each{
-		log.debug "############"
-		log.debug "event $it"
-		def event = [:]
-		def e = it
-		event.displayName = e.displayName
-		event.name = e.name
-		event.value = e.value
-		event.locationId = e.locationId
-		event.deviceId = e.deviceId
-		event.isPhysical = e.isPhysical()
-		event.description = e.description
-		event.descriptionText = e.descriptionText
-		event.isoDate = e.isoDate
-		event.ts = e.date.getTime()
-		event.source = e.source
-		log.debug "api event: $event"
-		it.properties.each { prop, val ->
-			log.debug "------   $prop: $val"
-		}
-	}*/
-	log.debug "all events: $events"
-	events
+	def filteredEvents = [:]
+	
+	eventsPerCapability.each {type, events ->
+		filteredEvents[type] = filterEventsPerCapability(events?.flatten(), type)
+	}
+	def events = filteredEvents.values()?.flatten()?.findAll{it}
+	log.debug "events ${events?.findAll{!it.date}}"
+	events?.sort{it.date}.reverse()
 }
 
 def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
