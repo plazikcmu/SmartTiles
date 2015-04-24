@@ -895,32 +895,6 @@ def getTileIcons() {
 	]
 }
 
-def getDeviceTypeEventsMap() {
-	[
-		dimmer : ["switch", "level"],
-		dimmerLight : ["switch", "level"],
-		switch : ["switch"],
-		light : ["switch"],
-		themeLight: ["switch"],
-		lock : ["lock"],
-		motion : ["motion"],
-		presence : ["presence"],
-		contact : ["presence"],
-		water : ["presence"],
-		momentary : "*",
-		camera : "*",
-		humidity : ["humidity"],
-		temperature : ["temperature"],
-		energy : ["energy"],
-		power : ["power"],
-		battery : ["battery"],
-        thermostatHeat : ["humidity", "temperature", "thermostatFanMode", "thermostatOperatingState", heatingSetpoint],
-        thermostatCool : ["humidity", "temperature", "thermostatFanMode", "thermostatOperatingState", coolingSetpoint],
-		weather: ["weather", "feelsLike", "temperature", "localSunrise", "localSunset", "percentPrecip", "humidity"],
-		music: ["status", "level", "trackDescription", "mute"]
-	]
-}
-
 def getListIcon(type) {
 	def icons = [
 		lock: getTileIcons().lock.locked,
@@ -940,9 +914,11 @@ def getListIcon(type) {
 	icons[type] ?: getTileIcons()[type]
 }
 
-def getEventIcon(type, value) {
-	""
-	//getTileIcons()[type][value]
+def getEventIcon(event) {
+	def eventValues = getTileIcons()[event.capability]
+	log.debug "eventValues for $event.capability: ${"$eventValues".replaceAll("<", "[")}"
+	if (eventValues instanceof String) return eventValues
+	eventValues ? eventValues[event.value] : ""
 }
 
 def getThemeLightIcon() {
@@ -959,7 +935,7 @@ def shouldShowEvent(type) {
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.capability" data-name="$data.name" data-value="$data.value" data-event="$data"><span style=" white-space: nowrap;">${formatDate(data.date)}</span>   <span style=" white-space: nowrap;">${getEventIcon(data.name, data.value)}</span> <span style=" white-space: nowrap;">$data.displayName &#8594; $data.value${data.unit ?: ""}</span></li>"""}
+def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data"><span style=" white-space: nowrap;">${formatDate(data.date)}</span>   <span style=" white-space: nowrap;">${getEventIcon(data)}</span> <span style=" white-space: nowrap;">$data.displayName &#8594; $data.value${data.unit ?: ""}</span></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1070,74 +1046,74 @@ def getEventsOfDevice(device) {
 	device.eventsSince(new Date() - ((historyDuration ?: 1) as int), [max: ((maxResults ?: 3) as int)])?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
 }
 
-def filterEventsPerCapability(events, capability) {
+def filterEventsPerCapability(events, deviceType) {
 	def acceptableEventsPerCapability = [
-		lights             : ["switch"],
-		dimmerLights       : ["switch", "level"],
-		switches           : ["switch"],
-		dimmers            : ["switch", "level"],
-		momentaries        : ["switch"],
-		themeLights        : ["switch"],
-		thermostatsHeat    : ["temperature", "heatingSetpoint", "thermostatFanMode", "thermostatOperatingState",],
-		thermostatsCool    : ["temperature", "coolingSetpoint", "thermostatFanMode", "thermostatOperatingState",],
-		locks              : ["lock"],
-		music              : ["status", "level", "trackDescription", "mute"],
-//		camera             : [],
-		presence           : ["presence"],
-		contacts           : ["contact"],
-		motion             : ["motion"],
-		temperature        : ["temperature"],
-		humidity           : ["humidity"],
-		water              : ["water"],
-		battery            : ["battery"],
-		energy             : ["energy"],
-		power              : ["power"],
-		acceleration       : ["acceleration"],
-		luminosity         : ["illuminance"],
-		weather            : ["*"],
+		light           : ["switch"],
+		dimmerLight     : ["switch", "level"],
+		switch          : ["switch"],
+		dimmer          : ["switch", "level"],
+		momentary       : ["switch"],
+		themeLight      : ["switch"],
+		thermostatHeat  : ["temperature", "heatingSetpoint", "thermostatFanMode", "thermostatOperatingState",],
+		thermostatCool  : ["temperature", "coolingSetpoint", "thermostatFanMode", "thermostatOperatingState",],
+		lock            : ["lock"],
+		music           : ["status", "level", "trackDescription", "mute"],
+		camera          : [],
+		presence        : ["presence"],
+		contact         : ["contact"],
+		motion          : ["motion"],
+		temperature     : ["temperature"],
+		humidity        : ["humidity"],
+		water           : ["water"],
+		battery         : ["battery"],
+		energy          : ["energy"],
+		power           : ["power"],
+		acceleration    : ["acceleration"],
+		luminosity      : ["illuminance"],
+		weather         : ["*"],
 	]
-	/*events?.each{
-		log.debug "checking event $it for capability $capability | ${it.name in acceptableEventsPerCapability[capability]}"
-	}*/
-	if (events) events*.capability = capability
-	events?.findAll{it.name in acceptableEventsPerCapability[capability]}
+	//events?.each{
+	//	log.debug "checking event $it for deviceType $deviceType | ${it.name in acceptableEventsPerCapability[deviceType]}"
+	//}
+	
+	if (events) events*.deviceType = deviceType
+	events?.findAll{it.name in acceptableEventsPerCapability[deviceType]}
 }
 
 def getAllDeviceEvents() {
 	def eventsPerCapability = [
-		lights             : lights                ?.collect{getEventsOfDevice(it)},
-		dimmerLights       : dimmerLights          ?.collect{getEventsOfDevice(it)},
-		switches           : switches              ?.collect{getEventsOfDevice(it)},
-		dimmers            : dimmers               ?.collect{getEventsOfDevice(it)},
-		momentaries        : momentaries           ?.collect{getEventsOfDevice(it)},
-		themeLights        : themeLights           ?.collect{getEventsOfDevice(it)},
-		thermostatsHeat    : thermostatsHeat       ?.collect{getEventsOfDevice(it)},
-		thermostatsCool    : thermostatsCool       ?.collect{getEventsOfDevice(it)},
-		locks              : locks                 ?.collect{getEventsOfDevice(it)},
-		music              : music                 ?.collect{getEventsOfDevice(it)},
-		camera             : camera                ?.collect{getEventsOfDevice(it)},
-		presence           : presence              ?.collect{getEventsOfDevice(it)},
-		contacts           : contacts              ?.collect{getEventsOfDevice(it)},
-		motion             : motion                ?.collect{getEventsOfDevice(it)},
-		temperature        : temperature           ?.collect{getEventsOfDevice(it)},
-		humidity           : humidity              ?.collect{getEventsOfDevice(it)},
-		water              : water                 ?.collect{getEventsOfDevice(it)},
-		battery            : battery               ?.collect{getEventsOfDevice(it)},
-		energy             : energy                ?.collect{getEventsOfDevice(it)},
-		power              : power                 ?.collect{getEventsOfDevice(it)},
-		acceleration       : acceleration          ?.collect{getEventsOfDevice(it)},
-		luminosity         : luminosity            ?.collect{getEventsOfDevice(it)},
-		weather            : weather               ?.collect{getEventsOfDevice(it)},
+		light           : lights                ?.collect{getEventsOfDevice(it)},
+		dimmerLight     : dimmerLights          ?.collect{getEventsOfDevice(it)},
+		switch          : switches              ?.collect{getEventsOfDevice(it)},
+		dimmer          : dimmers               ?.collect{getEventsOfDevice(it)},
+		momentary       : momentaries           ?.collect{getEventsOfDevice(it)},
+		themeLight      : themeLights           ?.collect{getEventsOfDevice(it)},
+		thermostatHeat  : thermostatsHeat       ?.collect{getEventsOfDevice(it)},
+		thermostatCool  : thermostatsCool       ?.collect{getEventsOfDevice(it)},
+		lock            : locks                 ?.collect{getEventsOfDevice(it)},
+		music           : music                 ?.collect{getEventsOfDevice(it)},
+		camera          : camera                ?.collect{getEventsOfDevice(it)},
+		presence        : presence              ?.collect{getEventsOfDevice(it)},
+		contact         : contacts              ?.collect{getEventsOfDevice(it)},
+		motion          : motion                ?.collect{getEventsOfDevice(it)},
+		temperature     : temperature           ?.collect{getEventsOfDevice(it)},
+		humidity        : humidity              ?.collect{getEventsOfDevice(it)},
+		water           : water                 ?.collect{getEventsOfDevice(it)},
+		battery         : battery               ?.collect{getEventsOfDevice(it)},
+		energy          : energy                ?.collect{getEventsOfDevice(it)},
+		power           : power                 ?.collect{getEventsOfDevice(it)},
+		acceleration    : acceleration          ?.collect{getEventsOfDevice(it)},
+		luminosity      : luminosity            ?.collect{getEventsOfDevice(it)},
+		weather         : weather               ?.collect{getEventsOfDevice(it)},
 	]
 	
 	def filteredEvents = [:]
 	
-	eventsPerCapability.each {type, events ->
-		filteredEvents[type] = filterEventsPerCapability(events?.flatten(), type)
+	eventsPerCapability.each {deviceType, events ->
+		filteredEvents[deviceType] = filterEventsPerCapability(events?.flatten(), deviceType)
 	}
-	def events = filteredEvents.values()?.flatten()?.findAll{it}
-	log.debug "events ${events?.findAll{!it.date}}"
-	events?.sort{it.date}.reverse()
+	//log.debug "filteredEvents: $filteredEvents"
+	filteredEvents.values()?.flatten()?.findAll{it}?.sort{it.date}.reverse()
 }
 
 def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
