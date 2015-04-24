@@ -918,7 +918,7 @@ def getEventIcon(event) {
 	def eventValues = getTileIcons()[event.capability]
 	log.debug "eventValues for $event.capability: ${"$eventValues".replaceAll("<", "[")}"
 	if (eventValues instanceof String) return eventValues
-	eventValues ? eventValues[event.value] : ""
+	eventValues ? eventValues[event.value] : "[icon]"
 }
 
 def getThemeLightIcon() {
@@ -935,7 +935,7 @@ def shouldShowEvent(type) {
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data"><span style=" white-space: nowrap;">${formatDate(data.date)}</span>   <span style=" white-space: nowrap;">${getEventIcon(data)}</span> <span style=" white-space: nowrap;">$data.displayName &#8594; $data.value${data.unit ?: ""}</span></li>"""}
+def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data">${getEventIcon(data)}<span style=" white-space: nowrap;">${formatDate(data.date)}</span><span style=" white-space: nowrap;">$data.displayName &#8594; $data.value${data.unit ?: ""}</span></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
