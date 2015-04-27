@@ -248,7 +248,6 @@ def prefs(params) {
 		
 		section() {
 			input "historyDuration", title: "Event History Period (days)", "int", required: true, defaultValue: 1
-			input "maxResults", title: "Maximum History Events Per Device", "int", required: true, defaultValue: 10
 		}			
 		
 		section() {
@@ -935,7 +934,7 @@ def shouldShowEvent(type) {
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data">${getEventIcon(data)}<span style=" white-space: nowrap;">${formatDate(data.date)}</span><span style=" white-space: nowrap;">$data.displayName &#8594; $data.value${data.unit ?: ""}</span></li>"""}
+def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data">${getEventIcon(data)}<span style=" white-space: nowrap;">${formatDate(data.date)}</span><span style=" white-space: nowrap;">$data.displayName <i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</span></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1043,7 +1042,11 @@ def allDeviceData() {
 }
 
 def getEventsOfDevice(device) {
-	device.eventsSince(new Date() - ((historyDuration ?: 1) as int), [max: ((maxResults ?: 3) as int)])?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
+	//def date = "${new Date()}"
+	//log.debug "date $date, location.timeZone $location.timeZone"
+	//def now = timeToday(date)
+	//log.debug "from $now"
+	device.eventsSince(new Date() - ((historyDuration ?: 1) as int))?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
 }
 
 def filterEventsPerCapability(events, deviceType) {
@@ -1070,14 +1073,14 @@ def filterEventsPerCapability(events, deviceType) {
 		power           : ["power"],
 		acceleration    : ["acceleration"],
 		luminosity      : ["illuminance"],
-		weather         : ["*"],
+		weather         : ["temperature", "weather"],
 	]
 	//events?.each{
 	//	log.debug "checking event $it for deviceType $deviceType | ${it.name in acceptableEventsPerCapability[deviceType]}"
 	//}
 	
 	if (events) events*.deviceType = deviceType
-	"weather" == deviceType ? events : events?.findAll{it.name in acceptableEventsPerCapability[deviceType]}
+	events?.findAll{it.name in acceptableEventsPerCapability[deviceType]}
 }
 
 def getAllDeviceEvents() {
@@ -1113,7 +1116,7 @@ def getAllDeviceEvents() {
 		filteredEvents[deviceType] = filterEventsPerCapability(events?.flatten(), deviceType)
 	}
 	//log.debug "filteredEvents: $filteredEvents"
-	filteredEvents.values()?.flatten()?.findAll{it}?.sort{it.date}.reverse()
+	filteredEvents.values()?.flatten()?.findAll{it}?.sort{"$it.date.time" + "$it.deviceType"}.reverse()
 }
 
 def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
