@@ -915,7 +915,7 @@ def getListIcon(type) {
 
 def getEventIcon(event) {
 	def eventValues = getTileIcons()[event.deviceType]
-	log.debug "eventValues for $event.deviceType: ${"$eventValues".replaceAll("<", "[")}"
+	//log.debug "eventValues for $event.deviceType: ${"$eventValues".replaceAll("<", "[")}"
 	if (eventValues instanceof String) return eventValues
 	eventValues ? eventValues[event.value] : "[icon]"
 }
@@ -1042,11 +1042,18 @@ def allDeviceData() {
 }
 
 def getEventsOfDevice(device) {
-	//def date = "${new Date()}"
-	//log.debug "date $date, location.timeZone $location.timeZone"
-	//def now = timeToday(date)
-	//log.debug "from $now"
-	device.eventsSince(new Date() - ((historyDuration ?: 1) as int))?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
+	//TimeZone.setDefault(location.timeZone)
+	/*log.debug "now is $stamp, new date is ${new Date()} time zone is $location.timeZone"
+	def date = timeToday(stamp, location.timeZone)
+	log.debug "date $date, yesterday: ${date - 1}"
+	
+	date = new Date()*/
+	def today = new Date()
+	def yesterday = today - 1
+	//log.debug "today $today, yesterday $yesterday, yestr2 ${new Date(today.time - timeOffset("24:00"))}"
+	det t = timeToday("14:30", location.timeZone)
+	log.debug "t=$t"
+	device.eventsBetween(today - 1, today)?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
 }
 
 def filterEventsPerCapability(events, deviceType) {
