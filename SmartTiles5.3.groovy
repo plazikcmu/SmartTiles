@@ -750,7 +750,7 @@ def getDate() {
 }
 
 def formatDate(date) {
-	def tf = new java.text.SimpleDateFormat("h:mm:ss a, dd MMMMM yyyy ")
+	def tf = new java.text.SimpleDateFormat("h:mm:ss a, dd MMMMM")
     if (location?.timeZone) tf.setTimeZone(location.timeZone)
     return tf.format(date)
 }
@@ -934,7 +934,7 @@ def shouldShowEvent(type) {
 
 def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data">${getEventIcon(data)}<span style=" white-space: nowrap;">${formatDate(data.date)}</span><span style=" white-space: nowrap;">$data.displayName <i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</span></li>"""}
+def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value"><div>${getEventIcon(data)}</div><div>$data.displayName <i class="fa fw-fw fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</div><br/><div>${data.date.format("h:mm:ss a, dd MMMMM")}</div></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1041,21 +1041,6 @@ def allDeviceData() {
 	data.sort{state?.sortOrder?."$it.type-$it.device"}
 }
 
-def getEventsOfDevice(device) {
-	//TimeZone.setDefault(location.timeZone)
-	/*log.debug "now is $stamp, new date is ${new Date()} time zone is $location.timeZone"
-	def date = timeToday(stamp, location.timeZone)
-	log.debug "date $date, yesterday: ${date - 1}"
-	
-	date = new Date()*/
-	def today = new Date()
-	def yesterday = today - 1
-	//log.debug "today $today, yesterday $yesterday, yestr2 ${new Date(today.time - timeOffset("24:00"))}"
-	det t = timeToday("14:30", location.timeZone)
-	log.debug "t=$t"
-	device.eventsBetween(today - 1, today)?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
-}
-
 def filterEventsPerCapability(events, deviceType) {
 	def acceptableEventsPerCapability = [
 		light           : ["switch"],
@@ -1082,12 +1067,15 @@ def filterEventsPerCapability(events, deviceType) {
 		luminosity      : ["illuminance"],
 		weather         : ["temperature", "weather"],
 	]
-	//events?.each{
-	//	log.debug "checking event $it for deviceType $deviceType | ${it.name in acceptableEventsPerCapability[deviceType]}"
-	//}
 	
 	if (events) events*.deviceType = deviceType
 	events?.findAll{it.name in acceptableEventsPerCapability[deviceType]}
+}
+
+def getEventsOfDevice(device) {
+	def today = new Date()
+	def then = timeToday(today.format("HH:mm"), TimeZone.getTimeZone('UTC')) - 1
+	device.eventsBetween(then, today, [max: 200])?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
 }
 
 def getAllDeviceEvents() {
@@ -1134,9 +1122,9 @@ def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay
 def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8" />
 <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} SmartTiles URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
 
-def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body style='background-color:black; color: white'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
+def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body class='theme-$theme'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
-def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body style='background-color:black; color: white'><ul class="list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
+def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'><ul class="list history">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
 
 def customCSS() {
 """
