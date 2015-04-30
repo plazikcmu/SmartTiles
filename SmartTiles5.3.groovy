@@ -1127,7 +1127,7 @@ def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body style='background-color:black; color: white'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
-def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body style='background-color:black; color: white'><ul class="list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
+def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'><ul class="list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
 
 def customCSS() {
 """
