@@ -1042,18 +1042,9 @@ def allDeviceData() {
 }
 
 def getEventsOfDevice(device) {
-	//TimeZone.setDefault(location.timeZone)
-	/*log.debug "now is $stamp, new date is ${new Date()} time zone is $location.timeZone"
-	def date = timeToday(stamp, location.timeZone)
-	log.debug "date $date, yesterday: ${date - 1}"
-	
-	date = new Date()*/
 	def today = new Date()
-	def yesterday = today - 1
-	//log.debug "today $today, yesterday $yesterday, yestr2 ${new Date(today.time - timeOffset("24:00"))}"
-	def t = timeToday(today.format("HH:mm"), TimeZone.getTimeZone('UTC'))
-	log.debug "t=$t, ${t-1}"
-	device.eventsBetween(t - 1, new Date(), [max: 100])?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
+	def then = timeToday(today.format("HH:mm"), TimeZone.getTimeZone('UTC')) - 1
+	device.eventsBetween(then, today, [max: 200])?.findAll{"$it.source" == "DEVICE"}?.collect{[description: it.description, descriptionText: it.descriptionText, displayName: it.displayName, date: it.date, name: it.name, unit: it.unit, source: it.source, value: it.value]}
 }
 
 def filterEventsPerCapability(events, deviceType) {
