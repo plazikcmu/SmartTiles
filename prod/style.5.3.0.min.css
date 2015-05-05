@@ -139,6 +139,16 @@ div.ui-slider{height:21px;}
 .music:not(.active) .pause {display:none}
 
 .music i {cursor: pointer;}
+
+
+/*history */
+
+.event-icon {
+    float: left;
+    font-size: 2em;
+}
+
+
 /*  THEMES */
 /* slate */
 .theme-slate .tile {background-color:#333333}
