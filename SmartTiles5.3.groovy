@@ -654,7 +654,7 @@ ul{list-style-type: none;padding-left:0;}
 * {color: white;font-size:16px;}
 .batt {background-size: 20px 20px;}
 .item {cursor:grab; padding:5px; margin:8px;border-radius:2px}
-.list {width: 100%; margin: 0 auto 60px auto;}
+.list {width: 75%; margin: 0 auto; min-width: 300px}
 .list i {margin-right:5px;}
 ${getThemeLightIcon().css}
 </style>
@@ -718,7 +718,7 @@ ul{list-style-type: none;padding-left:0;}
 * {color: white;font-size:20px;}
 .batt {background-size: 20px 20px;}
 .item {cursor:grab; padding:5px; margin:8px;border-radius:2px}
-.list {width: 75%; margin: 0 auto 60px auto;}
+.list {width: 75%; margin: 0 auto 60px auto; min-width: 300px}
 .list i {margin-right:5px;}
 ${getThemeLightIcon().css}
 </style>
@@ -932,9 +932,9 @@ def shouldShowEvent(type) {
 	[temperature: showtemperature, acceleration: showacceleration, status: showstatus, contact: showcontact, lock: showlock, door: showdoor, presence: showpresence, motion: showmotion, alarm: showalarm, switch: showswitch][type]
 }
 
-def renderListItem(data) {return """<li class="item $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
+def renderListItem(data) {return """<li class="item tile $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item $data.deviceType" data-name="$data.name" data-value="$data.value" data-event="$data">${getEventIcon(data)}<span style=" white-space: nowrap;">${formatDate(data.date)}</span><span style=" white-space: nowrap;">$data.displayName <i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</span></li>"""}
+def renderEvent(data) {return """<li class="item history tile $data.deviceType" data-name="$data.name" data-value="$data.value"><div class="event-icon">${getEventIcon(data)}</div><div class="event">$data.displayName <i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</div><div class="date">${formatDate(data.date)}</div></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1125,7 +1125,7 @@ def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay
 def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8" />
 <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} SmartTiles URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
 
-def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body style='background-color:black; color: white'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
+def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body class='theme-$theme'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
 def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'><ul class="list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
 
