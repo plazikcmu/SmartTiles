@@ -146,6 +146,7 @@ div.ui-slider{height:21px;}
 .event-icon {
     float: left;
     font-size: 2em;
+	margin: 0 5px;
 }
 
 
