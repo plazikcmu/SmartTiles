@@ -154,7 +154,7 @@ ul{list-style-type: none;padding-left:0;}
     font-size: 2em;
 	margin: 0 5px;
 }
-
+.history .st-weather {font-size: 80%;}
 .item.history {cursor:default; font-size:12pt;}
 
 /*  THEMES */
