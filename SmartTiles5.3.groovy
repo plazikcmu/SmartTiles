@@ -349,6 +349,7 @@ mappings {
         path("/list") {action: [GET: "oauthError"]}
         path("/history") {action: [GET: "oauthError"]}
         path("/position") {action: [GET: "oauthError"]}
+        path("/css") {action: [GET: "oauthError"]}
 	} else if (!params.access_token) {
 		path("/ui") {action: [GET: "html"]}
         path("/command") {action: [GET: "command"]}
@@ -358,6 +359,7 @@ mappings {
         path("/list") {action: [GET: "list"]}
         path("/history") {action: [GET: "history"]}
 		path("/position") {action: [GET: "position"]}
+		path("/css") {action: [GET: "css"]}
 	} else {
         path("/ui") {action: [GET: "html"]}
         path("/command") {action: [GET: "command"]}
@@ -367,6 +369,7 @@ mappings {
 		path("/list") {action: [GET: "list"]}
 		path("/history") {action: [GET: "history"]}
 		path("/position") {action: [GET: "position"]}
+		path("/css") {action: [GET: "css"]}
     }
 }
 
@@ -659,7 +662,30 @@ ul{list-style-type: none;padding-left:0;}
 ${getThemeLightIcon().css}
 </style>
 """
-}  
+}
+
+def headCSS() {
+"""
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title>${app.label ?: location.name} Custom CSS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript" charset="utf-8"></script>
+<style>
+#editor { 
+	position: absolute;
+	top: 70px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+</style>
+<script>
+function getText() {
+	alert(editor.getValue());
+}
+</script>
+"""
+}
 
 def headList() {
 """
@@ -1122,8 +1148,9 @@ def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
 
-def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8" />
-<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} SmartTiles URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
+def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} SmartTiles URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
+
+def css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headCSS()}</head><body><div>menu</div><div id="editor">${state.customCSS ?: ""}</div><script>var editor = ace.edit("editor");editor.setTheme("ace/theme/clouds");editor.getSession().setMode("ace/mode/css");</script></body></html>"""}
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body class='theme-$theme'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
