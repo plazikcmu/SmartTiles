@@ -247,16 +247,16 @@ def prefs(params) {
 		}
 		
 		section() {
-			input "historyDuration", title: "Event History Period (days)", "int", required: true, defaultValue: 1
-		}			
-		
-		section() {
 			input "themeLightType", title: "Theme Lights", "enum", multiple: false, required: true, defaultValue: "Default", options: ["Default", "Christmas", "Valentine's Day"]
 		}
 		
 		if (state) {
 			section() {
-				href url:"${generateURL("list").join()}", style:"embedded", required:false, title:"Device Order", description:"Tap to change, then click \"Done\""
+				href url:"${generateURL("list").join()}", style:"embedded", required:false, title:"Device Order", description: "Tap to change, then click \"Done\""
+			}
+			
+			section() {
+				href url:"${generateURL("css").join()}", style:"embedded", required:false, title:"Custom CSS", description: "Tap to change, then click \"Done\""
 			}
 		}
 		
@@ -341,15 +341,16 @@ def nextPage() {
 
 mappings {
 	if (params.access_token && params.access_token != state.accessToken) {
-        path("/ui") {action: [GET: "oauthError"]}
-        path("/command") {action: [GET: "oauthError"]}
-        path("/data") {action: [GET: "oauthError"]}
-        path("/ping") {action: [GET: "oauthError"]}
-        path("/link") {action: [GET: "oauthError"]}
-        path("/list") {action: [GET: "oauthError"]}
-        path("/history") {action: [GET: "oauthError"]}
-        path("/position") {action: [GET: "oauthError"]}
-        path("/css") {action: [GET: "oauthError"]}
+		def oauthError = [GET: "oauthError"]
+        path("/ui") {action: oauthError}
+        path("/command") {action: oauthError}
+        path("/data") {action: oauthError}
+        path("/ping") {action: oauthError}
+        path("/link") {action: oauthError}
+        path("/list") {action: oauthError}
+        path("/history") {action: oauthError}
+        path("/position") {action: oauthError}
+        path("/css") {action: [GET: "oauthError", POST: "oauthError"]}
 	} else if (!params.access_token) {
 		path("/ui") {action: [GET: "html"]}
         path("/command") {action: [GET: "command"]}
@@ -359,7 +360,7 @@ mappings {
         path("/list") {action: [GET: "list"]}
         path("/history") {action: [GET: "history"]}
 		path("/position") {action: [GET: "position"]}
-		path("/css") {action: [GET: "css"]}
+		path("/css") {action: [GET: "css", POST: "saveCSS"]}
 	} else {
         path("/ui") {action: [GET: "html"]}
         path("/command") {action: [GET: "command"]}
@@ -369,7 +370,7 @@ mappings {
 		path("/list") {action: [GET: "list"]}
 		path("/history") {action: [GET: "history"]}
 		path("/position") {action: [GET: "position"]}
-		path("/css") {action: [GET: "css"]}
+		path("/css") {action: [GET: "css", POST: "saveCSS"]}
     }
 }
 
@@ -1015,6 +1016,11 @@ def ping() {
 	else [status: "update", updated: getTS(), ts: getStateTS(), data: allDeviceData()]
 }
 
+def saveCSS() {
+	state.customCSS = params.css
+	css()
+}
+
 def allDeviceData() {
 	def refresh = [tile: "refresh", ts: getTS(), name: "Refresh", type: "refresh"]
 	if (disableDashboard) return [refresh]
@@ -1143,14 +1149,14 @@ def getAllDeviceEvents() {
 	filteredEvents.values()?.flatten()?.findAll{it}?.sort{"$it.date.time" + "$it.deviceType"}.reverse()
 }
 
-def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()}</head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
+def html() {render contentType: "text/html", data: "<!DOCTYPE html><html><head>${head()}${customCSS()} \n<style>${state.customCSS ?: ""}</style></head><body class='theme-$theme'>\n${renderTiles()}\n${renderWTFCloud()}${footer()}</body></html>"}
 def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile(it)}.join("\n")}<div class="blank tile"></div></div>"""}
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
 
 def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} SmartTiles URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
 
-def css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headCSS()}</head><body><div>menu</div><div id="editor">${state.customCSS ?: ""}</div><script>var editor = ace.edit("editor");editor.setTheme("ace/theme/clouds");editor.getSession().setMode("ace/mode/css");</script></body></html>"""}
+def css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headCSS()}</head><body><form action="css?access_token=$state.accessToken" method="post"><textarea rows="9" cols="30" style="font-size:10px;" name="css">${state.customCSS ?: "custom css here"}</textarea><br/><input type="submit" value="Save CSS"></form></body></html>"""}
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body class='theme-$theme'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
