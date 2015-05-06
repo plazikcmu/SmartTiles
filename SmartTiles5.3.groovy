@@ -60,10 +60,6 @@ preferences {
 		section() {
 			href "prefs", title: "Preferences", params: [main:true]
 		}
-		
-		section() {
-			href "filterevents", title: "Event History"
-		}
     }
 	
 	page(name: "controlThings", title: "Things", install: false) {
@@ -218,6 +214,7 @@ def dashboards() {
 }
 
 def moreTiles(params) {
+	state.appVersionT = appVersion()
 	dynamicPage(name: "moreTiles", title: "More Tiles", install: false, nextPage: params?.main ? null : "nextPage") {
 		section() {
 			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
@@ -230,6 +227,7 @@ def moreTiles(params) {
 }
 
 def prefs(params) {
+	state.appVersionP = appVersion()
 	dynamicPage(name: "prefs", title: "Preferences", install: false, nextPage: params?.main ? null : "nextPage") {
 		section() {
 			label title: "Title", required: false, defaultValue: "$location SmartTiles"
@@ -266,23 +264,6 @@ def prefs(params) {
 	}
 }
 
-def filterevents() {
-	dynamicPage(name: "filterevents", title: "Event Types to Show", install: false) {
-		section() {
-			input "showtemperature", title: "temperature", "bool", required: true, defaultValue: true
-			input "showacceleration", title: "acceleration", "bool", required: true, defaultValue: true
-			input "showstatus", title: "status", "bool", required: true, defaultValue: true
-			input "showcontact", title: "contact", "bool", required: true, defaultValue: true
-			input "showlock", title: "lock", "bool", required: true, defaultValue: true
-			input "showdoor", title: "door", "bool", required: true, defaultValue: true
-			input "showpresence", title: "presence", "bool", required: true, defaultValue: true
-			input "showmotion", title: "motion", "bool", required: true, defaultValue: true
-			input "showalarm", title: "alarm", "bool", required: true, defaultValue: true
-            input "showswitch", title: "switch", "bool", required: true, defaultValue: true
-		}
-	}
-}
-
 def authenticationPreferences() {
 	dynamicPage(name: "authenticationPreferences", title: "Access and Authentication", install: false) {
 		section() {
@@ -314,21 +295,24 @@ def viewURL() {
 			href url:"${generateURL("link").join()}", style:"embedded", required:false, title:"URL", description:"Tap to view, then click \"Done\""
 		}
 		
-		section("Send URL via SMS...") {
+		section() {
 			paragraph "Optionally, send SMS containing the URL of ${title ?: location.name} SmartTiles to a phone number. The URL will be sent in two parts because it's too long."
 			input "phone", "phone", title: "Which phone?", required: false
+		}
+		
+		section() {
+			href "selectDevices", title:"Return to settings"
 		}
 	}
 }
 
 def nextPage() {
-	if (settings.resetOauth) {log.debug "WTF!? $settings.resetOauth"}
-	
-	if (!showClock) {
+	if (state?.appVersionT != appVersion() || !showClock) {
 		log.debug "nextPage moreTiles"
 		moreTiles()
-	} else if (!theme) {
+	} else if (state?.appVersionP != appVersion() || !theme) {
 		log.debug "nextPage prefs"
+		state.appVersionP = appVersion()
 		prefs()
 	} else if (settings.resetOauth) {
 		log.debug "nextPage resetOauth"
@@ -530,6 +514,8 @@ def initialize() {
 	subscribe(thermostatsCool, "coolingSetpoint", handler, [filterEvents: false])
 	subscribe(thermostatsCool, "thermostatFanMode", handler, [filterEvents: false])
 	subscribe(thermostatsCool, "thermostatOperatingState", handler, [filterEvents: false])
+	
+	state.appVersion = appVersion()
 }
 
 def weatherRefresh() {
@@ -662,29 +648,6 @@ ul{list-style-type: none;padding-left:0;}
 .list i {margin-right:5px;}
 ${getThemeLightIcon().css}
 </style>
-"""
-}
-
-def headCSS() {
-"""
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-<title>${app.label ?: location.name} Custom CSS</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript" charset="utf-8"></script>
-<style>
-#editor { 
-	position: absolute;
-	top: 70px;
-	right: 0;
-	bottom: 0;
-	left: 0;
-}
-</style>
-<script>
-function getText() {
-	alert(editor.getValue());
-}
-</script>
 """
 }
 
@@ -955,10 +918,6 @@ def getThemeLightIcon() {
 	icons[themeLightType] ?: [off : "<i class='inactive fa fa-fw fa-lightbulb-o st-light-off'></i>", on : "<i class='active fa fa-fw fa-lightbulb-o st-light-on'></i>", css : ""]
 }
 
-def shouldShowEvent(type) {
-	[temperature: showtemperature, acceleration: showacceleration, status: showstatus, contact: showcontact, lock: showlock, door: showdoor, presence: showpresence, motion: showmotion, alarm: showalarm, switch: showswitch][type]
-}
-
 def renderListItem(data) {return """<li class="item tile $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
 def renderEvent(data) {return """<li class="item history tile $data.deviceType" data-name="$data.name" data-value="$data.value"><div class="event-icon">${getEventIcon(data)}</div><div class="event">$data.displayName <i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</div><div class="date">${formatDate(data.date)}</div></li>"""}
@@ -1154,9 +1113,9 @@ def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
 
-def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body>${title ?: location.name} SmartTiles URL:<br/><textarea rows="9" cols="30" style="font-size:10px;">${generateURL("ui").join()}</textarea><br/><br/>Copy the URL above and click Done.<br/></body></html>"""}
+def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body style="margin: 0;"><div style="padding:10px">${title ?: location.name} SmartTiles URL:</div><textarea rows="9" cols="30" style="font-size:10px; width: 100%">${generateURL("ui").join()}</textarea><div style="padding:10px">Copy the URL above and tap Done.</div></body></html>"""}
 
-def css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headCSS()}</head><body><form action="css?access_token=$state.accessToken" method="post"><textarea rows="9" cols="30" style="font-size:10px;" name="css">${state.customCSS ?: "custom css here"}</textarea><br/><input type="submit" value="Save CSS"></form></body></html>"""}
+def  css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body style="margin: 0;"><form action="css?access_token=$state.accessToken" method="post"><textarea rows="15" cols="30" style="font-size:12pt; width: 100%;" name="css">${state.customCSS ?: "custom css here"}</textarea><br/><input type="submit" value="Save" style="margin-left:10px"></form><br/><div style="padding:10px">Enter custom CSS and tap "Save", then tap "Done".<br/><br/>Please note that invalid CSS may break the dashboard. Use at your discretion.</div></body></html>"""}
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body class='theme-$theme'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
