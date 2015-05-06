@@ -140,8 +140,14 @@ div.ui-slider{height:21px;}
 
 .music i {cursor: pointer;}
 
+/* list */
 
-/*history */
+ul{list-style-type: none;padding-left:0;}
+.item {cursor:grab; padding:5px; margin:8px;border-radius:2px}
+.list {width: 300px; margin: 0 auto;}
+.list i {margin-right:5px;}
+
+/* history */
 
 .event-icon {
     float: left;
@@ -149,9 +155,7 @@ div.ui-slider{height:21px;}
 	margin: 0 5px;
 }
 
-.history {
-	cursor:default;
-}
+.item.history {cursor:default;}
 
 /*  THEMES */
 /* slate */
