@@ -143,7 +143,7 @@ div.ui-slider{height:21px;}
 /* list */
 
 ul{list-style-type: none;padding-left:0;}
-.item {cursor:grab; padding:5px; margin:8px;border-radius:2px; font-size:20px;}
+.item {cursor:grab; padding:5px; margin:8px;border-radius:2px; font-size:18pt;}
 .list {width: 300px; margin: 0 auto;}
 .list i {margin-right:5px;}
 
@@ -155,7 +155,7 @@ ul{list-style-type: none;padding-left:0;}
 	margin: 0 5px;
 }
 
-.item.history {cursor:default;}
+.item.history {cursor:default; font-size:16pt;}
 
 /*  THEMES */
 /* slate */
