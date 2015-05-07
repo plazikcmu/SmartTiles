@@ -811,7 +811,7 @@ def renderTile(data) {
 	} else if (data.tile == "refresh") {
 		return """<div class="refresh tile clickable"><div class="title">Refresh</div><div class="footer">Updated $data.ts</div></div>"""
 	} else if (data.tile == "history") {
-		return """<div class="historyLink tile"><div class="title">Event History</div><div class="icon"><a href="${generateURL("history").join()}" data-ajax="false" style="color:white"><i class="fa fa-clock-o"></i></a></div></div>"""
+		return """<div class="history tile"><div class="title">Event History</div></div>"""
 	} else if (data.tile == "mode") {
 		return renderModeTile(data)
 	} else if (data.tile == "clock") {

@@ -9,7 +9,7 @@
 .switch, .dimmer, .momentary, .light, .dimmerLight, .themeLight {background-color: #4caf50;} /*green*/
 .contact {background-color: #e91e63;}/*pink*/
 .refresh {background-color: #607d8b;} /*blue gray*/
-.historyLink {background-color: #607d8b;} /*blue gray*/
+.history {background-color: #607d8b;} /*blue gray*/
 .temperature {background-color: #ff6f00;} /*amber 900*/
 .mode {background-color: #673ab7;}/*deep purple*/
 .motion {background-color: #2196f3;}/*blue*/
@@ -37,7 +37,7 @@
 .switch, .dimmer, .dimmerLight, .momentary, .clock, .lock, .refresh, .link, .dashboard, .menu,
 .thermostatHeat .icon.up, .thermostatHeat .icon.down,
 .thermostatCool .icon.up, .thermostatCool .icon.down,
-.music i, .themeLight, .camera, .light, .historyLink {cursor: pointer;}
+.music i, .themeLight, .camera, .light, .history {cursor: pointer;}
 
 /* reset ***********************/
 body, .ui-page{background-color:black}
@@ -154,8 +154,8 @@ ul{list-style-type: none;padding-left:0;}
     font-size: 2em;
 	margin: 0 5px;
 }
-.history .st-weather {font-size: 80%;}
-.history .item{cursor:default; font-size:12pt;}
+.history.list .st-weather {font-size: 75%;}
+.history.list .item{cursor:default; font-size:12pt;}
 
 .historyNav {
 	text-align: center; 
