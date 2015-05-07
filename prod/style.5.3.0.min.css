@@ -168,9 +168,9 @@ ul{list-style-type: none;padding-left:0;}
 
 .historyNav i {
 	font-size: 30pt;
-	margin: 5px 20px;
+	margin: 5px 30px;
+	cursor: pointer;
 }
-
 
 .history.list {
     margin-top: 50px;
