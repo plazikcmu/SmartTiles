@@ -16,11 +16,9 @@
  *
  *  Copyright © 2014 Alex Malikov
  *
- *  Support for Foscam and Generic MJPEG video streams by k3v0
- *
  */
 definition(
-    name: "SmartTiles ${appVersion()}",
+    name: "SmartTiles ${appVersion()}-${appStream()}",
     namespace: "625alex",
     author: "Alex Malikov",
     description: "SmartTiles Dashboard, a SmartThings web client.",
@@ -30,12 +28,13 @@ definition(
     oauth: true)
 
 def appVersion() {"5.3.0"}
+def appStream() {"M"}
 
 preferences {
 	page(name: "selectDevices", install: false, uninstall: true, nextPage: "nextPage") {
         section("About") {
             paragraph "SmartTiles Dashboard, a SmartThings web client.\n\nYour home has a Home Page!™"
-            paragraph "Version ${appVersion()}\n\n" +
+            paragraph "Version ${appVersion()}-${appStream()}\n\n" +
             "If you like this app, please support the developer via PayPal:\n\ndonate@SmartTiles.click\n\n" +
             "Copyright © 2014 Alex Malikov"
 			href url:"http://SmartTiles.click", style:"embedded", required:false, title:"More information...", description:"www.SmartTiles.click"
@@ -335,16 +334,6 @@ mappings {
         path("/history") {action: oauthError}
         path("/position") {action: oauthError}
         path("/css") {action: [GET: "oauthError", POST: "oauthError"]}
-	} else if (!params.access_token) {
-		path("/ui") {action: [GET: "html"]}
-        path("/command") {action: [GET: "command"]}
-        path("/data") {action: [GET: "allDeviceData"]}
-        path("/ping") {action: [GET: "ping"]}
-        path("/link") {action: [GET: "viewLinkError"]}
-        path("/list") {action: [GET: "list"]}
-        path("/history") {action: [GET: "history"]}
-		path("/position") {action: [GET: "position"]}
-		path("/css") {action: [GET: "css", POST: "saveCSS"]}
 	} else {
         path("/ui") {action: [GET: "html"]}
         path("/command") {action: [GET: "command"]}
@@ -1103,7 +1092,10 @@ def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile
 
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
 
-def link() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body style="margin: 0;"><div style="padding:10px">${title ?: location.name} SmartTiles URL:</div><textarea rows="9" cols="30" style="font-size:10px; width: 100%">${generateURL("ui").join()}</textarea><div style="padding:10px">Copy the URL above and tap Done.</div></body></html>"""}
+def link() {
+	if (!params.accessToken) return "You are not authorized to view OAuth access token"
+	render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body style="margin: 0;"><div style="padding:10px">${title ?: location.name} SmartTiles URL:</div><textarea rows="9" cols="30" style="font-size:10px; width: 100%">${generateURL("ui").join()}</textarea><div style="padding:10px">Copy the URL above and tap Done.</div></body></html>"""
+}
 
 def  css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body style="margin: 0;"><form action="css?access_token=$state.accessToken" method="post"><textarea rows="10" cols="30" style="font-size:12pt; width: 100%;" name="css">${state.customCSS ?: "custom css here"}</textarea><br/><input type="submit" value="Save" style="margin-left:10px"></form><br/><div style="padding:10px">Enter custom CSS and tap "Save", then tap "Done".<br/><br/>Please note that invalid CSS may break the dashboard. Use at your discretion.</div></body></html>"""}
 
@@ -1113,13 +1105,16 @@ def historyNav() {
 """
 <div style="" class="historyNav">
 <i class="fa fa-fw fa-arrow-left" onclick="window.history.back();"></i>
-<i class="fa fa-fw fa-refresh" onclick="location.reload();"></i>
-<i class="fa fa-fw fa-chevron-up" onclick="scroll(0, 0);"></i>
+<i class="fa fa-fw fa-refresh" onclick="this.className = this.className + ' fa-spin'; location.reload();"></i>
+<i class="fa fa-fw fa-chevron-up" onclick="window.scrollTo(0, 0);"></i>
 </div>
 """
 }
 
-def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'>${historyNav()}<ul class="history list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
+def history() {
+	if (!showHistory) return ["history disabled"]
+	render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'>${historyNav()}<ul class="history list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""
+}
 
 def customCSS() {
 """
