@@ -1111,7 +1111,10 @@ def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head
 
 def historyNav() {
 """
+<div style="" class="historyNav">
+<i class="fa fa-fw fa-arrow-left"></i>
 <i class="fa fa-fw fa-refresh"></i>
+<i class="fa fa-fw fa-chevron-up"></i>
 </div>
 """
 }

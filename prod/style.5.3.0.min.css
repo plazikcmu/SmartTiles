@@ -162,6 +162,7 @@ ul{list-style-type: none;padding-left:0;}
 	position: fixed; 
 	opacity:0.7;
 	background-color: black;
+	width:100%;
 }
 
 .historyNav i {
@@ -177,7 +178,7 @@ ul{list-style-type: none;padding-left:0;}
 
 
 /* quartz */
-.theme-quartz .ui-page.ui-page-theme-a.ui-page-active, .theme-quartz, .historyNav {background-color:lightGrey}
+.theme-quartz .ui-page.ui-page-theme-a.ui-page-active, .theme-quartz, .theme-quartz .historyNav {background-color:lightGrey}
 .theme-quartz .tile {background-color:white}
 .theme-quartz * {color: #555}
 
@@ -188,7 +189,7 @@ ul{list-style-type: none;padding-left:0;}
 .theme-quartz .tile.active .icon i.active {color: orange}
 
 /* onyx */
-.theme-onyx .ui-page.ui-page-theme-a.ui-page-active, .theme-onyx, .historyNav {background-color:#444;}
+.theme-onyx .ui-page.ui-page-theme-a.ui-page-active, .theme-onyx, .theme-quartz .historyNav {background-color:#444;}
 .theme-onyx .tile {background-color:black}
 .theme-onyx * {color: wheat}
 
@@ -199,7 +200,7 @@ ul{list-style-type: none;padding-left:0;}
 .theme-onyx .tile.active .icon i.active {color: firebrick}
 
 /* cobalt */
-.theme-cobalt .ui-page.ui-page-theme-a.ui-page-active, .theme-cobalt, .historyNav {background-color:black}
+.theme-cobalt .ui-page.ui-page-theme-a.ui-page-active, .theme-cobalt, .theme-quartz .historyNav {background-color:black}
 .theme-cobalt .tile {background-color:#324B6E}
 .theme-cobalt * {color: white}
 
