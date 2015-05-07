@@ -177,11 +177,13 @@ ul{list-style-type: none;padding-left:0;}
 }
 
 /*  THEMES */
+.theme-default * {color: white}
+
 /* slate */
 .theme-slate .tile {background-color:#333333}
 .theme-slate  .ui-slider-handle.ui-btn.ui-shadow {background-color:white}
 .theme-slate .tile.active .icon i.active {color: blue}
-
+.theme-slate * {color: white}
 
 /* quartz */
 .theme-quartz .ui-page.ui-page-theme-a.ui-page-active, .theme-quartz, .theme-quartz .historyNav {background-color:lightGrey}
