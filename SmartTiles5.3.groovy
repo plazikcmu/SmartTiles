@@ -351,7 +351,7 @@ mappings {
 
 def oauthError() {[error: "OAuth token is invalid or access has been revoked"]}
 
-def getMinTemp() {getTemperatureScale() == "F" ? 50 : 10}
+def getMinTemp() {getTemperatureScale() == "F" ? 45 : 7}
 def getMaxTemp() {getTemperatureScale() == "F" ? 90 : 30}
 
 def command() {
