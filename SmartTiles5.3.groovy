@@ -910,7 +910,7 @@ def getThemeLightIcon() {
 
 def renderListItem(data) {return """<li class="item tile $data.type" data-type="$data.type" data-device="$data.device" id="$data.type|$data.device">${getListIcon(data.type)}$data.name</li>"""}
 
-def renderEvent(data) {return """<li class="item history tile $data.deviceType" data-name="$data.name" data-value="$data.value"><div class="event-icon">${getEventIcon(data)}</div><div class="event">$data.displayName &nbsp;<i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</div><div class="date">${formatDate(data.date)}</div></li>"""}
+def renderEvent(data) {return """<li class="item tile $data.deviceType" data-name="$data.name" data-value="$data.value"><div class="event-icon">${getEventIcon(data)}</div><div class="event">$data.displayName &nbsp;<i class="fa fa-long-arrow-right"></i> $data.value${data.unit ?: ""}</div><div class="date">${formatDate(data.date)}</div></li>"""}
 
 def getMusicPlayerData(device) {[tile: "device", type: "music", device: device.id, name: device.displayName, status: device.currentValue("status"), level: getDeviceLevel(device, "music"), trackDescription: device.currentValue("trackDescription"), mute: device.currentValue("mute") == "muted", active: device.currentValue("status") == "playing" ? "active" : ""]}
 
@@ -1109,7 +1109,14 @@ def  css() {render contentType: "text/html", data: """<!DOCTYPE html><html><head
 
 def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headList()}</head><body class='theme-$theme'><ul class="list">\n${allDeviceData()?.collect{renderListItem(it)}.join("\n")}</ul></body></html>"""}
 
-def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'><ul class="list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
+def historyNav() {
+"""
+<i class="fa fa-fw fa-refresh"></i>
+</div>
+"""
+}
+
+def history() {render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'>${historyNav()}<ul class="history list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""}
 
 def customCSS() {
 """

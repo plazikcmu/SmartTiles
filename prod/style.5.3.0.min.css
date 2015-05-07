@@ -157,6 +157,18 @@ ul{list-style-type: none;padding-left:0;}
 .history .st-weather {font-size: 80%;}
 .history .item{cursor:default; font-size:12pt;}
 
+.historyNav {
+	text-align: center; 
+	position: fixed; 
+	opacity:0.7;
+	background-color: black;
+}
+
+.historyNav i {
+	font-size: 30pt;
+	margin: 5 20px;
+}
+
 /*  THEMES */
 /* slate */
 .theme-slate .tile {background-color:#333333}
@@ -165,7 +177,7 @@ ul{list-style-type: none;padding-left:0;}
 
 
 /* quartz */
-.theme-quartz .ui-page.ui-page-theme-a.ui-page-active, .theme-quartz {background-color:lightGrey}
+.theme-quartz .ui-page.ui-page-theme-a.ui-page-active, .theme-quartz, .historyNav {background-color:lightGrey}
 .theme-quartz .tile {background-color:white}
 .theme-quartz * {color: #555}
 
@@ -176,7 +188,7 @@ ul{list-style-type: none;padding-left:0;}
 .theme-quartz .tile.active .icon i.active {color: orange}
 
 /* onyx */
-.theme-onyx .ui-page.ui-page-theme-a.ui-page-active, .theme-onyx{background-color:#444;}
+.theme-onyx .ui-page.ui-page-theme-a.ui-page-active, .theme-onyx, .historyNav {background-color:#444;}
 .theme-onyx .tile {background-color:black}
 .theme-onyx * {color: wheat}
 
@@ -187,7 +199,7 @@ ul{list-style-type: none;padding-left:0;}
 .theme-onyx .tile.active .icon i.active {color: firebrick}
 
 /* cobalt */
-.theme-cobalt .ui-page.ui-page-theme-a.ui-page-active, .theme-cobalt {background-color:black}
+.theme-cobalt .ui-page.ui-page-theme-a.ui-page-active, .theme-cobalt, .historyNav {background-color:black}
 .theme-cobalt .tile {background-color:#324B6E}
 .theme-cobalt * {color: white}
 
