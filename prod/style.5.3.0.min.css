@@ -154,7 +154,7 @@ ul{list-style-type: none;padding-left:0;}
     font-size: 2em;
 	margin: 0 5px;
 }
-.history-list.list .st-weather {font-size: 75%;}
+.history-list .st-weather {font-size: 70%;}
 .history-list .item{cursor:default; font-size:12pt;}
 
 .historyNav {
@@ -170,10 +170,6 @@ ul{list-style-type: none;padding-left:0;}
 	font-size: 30pt;
 	margin: 5px 30px;
 	cursor: pointer;
-}
-
-.history-list {
-    margin-top: 50px;
 }
 
 .history-list {
