@@ -53,11 +53,11 @@ preferences {
 		}
 		
 		section() {
-			href "moreTiles", title: "Other Tiles", params: [main:true]
+			href "moreTiles", title: "Other Tiles"
 		}
 		
 		section() {
-			href "prefs", title: "Preferences", params: [main:true]
+			href "prefs", title: "Preferences"
 		}
     }
 	
@@ -213,21 +213,21 @@ def dashboards() {
 }
 
 def moreTiles(params) {
-	state.appVersionT = appVersion()
-	dynamicPage(name: "moreTiles", title: "More Tiles", install: false, nextPage: params?.main ? null : "nextPage") {
+	log.debug "entering moreTiles $params"
+	dynamicPage(name: "moreTiles", title: "More Tiles", install: false) {
 		section() {
 			input "showMode", title: "Mode", "bool", required: true, defaultValue: true
 			input "showHelloHome", title: "Hello, Home!", "bool", required: true, defaultValue: true
-			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
 			input "showRefresh", title: "Refresh", "bool", required: true, defaultValue: true
 			input "showHistory", title: "Event History", "bool", required: true, defaultValue: true
+			input "showClock", title: "Clock", "enum", multiple: false, required: true, defaultValue: "Small Analog", options: ["Small Analog", "Small Digital", "Large Analog", "Large Digital", "None"]
 		}
 	}
 }
 
 def prefs(params) {
-	state.appVersionP = appVersion()
-	dynamicPage(name: "prefs", title: "Preferences", install: false, nextPage: params?.main ? null : "nextPage") {
+	log.debug "entering prefs $params"
+	dynamicPage(name: "prefs", title: "Preferences", install: false) {
 		section() {
 			label title: "Title", required: false, defaultValue: "$location SmartTiles"
 		}
@@ -277,7 +277,7 @@ def authenticationPreferences() {
 }
 
 def resetOauth() {
-	dynamicPage(name: "resetOauth", title: "Reset Access Token", install:false, nextPage: "nextPage") {
+	dynamicPage(name: "resetOauth", title: "Reset Access Token", install:false) {
 		generateURL(null)
 		
 		section() {
@@ -306,10 +306,11 @@ def viewURL() {
 }
 
 def nextPage() {
-	if (state?.appVersionT != appVersion() || !showClock) {
+	if (state?.appVersionT != appVersion()) {
 		log.debug "nextPage moreTiles"
+		state.appVersionT = appVersion()
 		moreTiles()
-	} else if (state?.appVersionP != appVersion() || !theme) {
+	} else if (state?.appVersionP != appVersion()) {
 		log.debug "nextPage prefs"
 		state.appVersionP = appVersion()
 		prefs()
@@ -323,6 +324,7 @@ def nextPage() {
 }
 
 mappings {
+	log.debug "incoming request $params"
 	if (params.access_token && params.access_token != state.accessToken) {
 		def oauthError = [GET: "oauthError"]
         path("/ui") {action: oauthError}
@@ -348,8 +350,6 @@ mappings {
 }
 
 def oauthError() {[error: "OAuth token is invalid or access has been revoked"]}
-
-def viewLinkError() {[error: "You are not authorized to view OAuth access token"]}
 
 def getMinTemp() {getTemperatureScale() == "F" ? 50 : 10}
 def getMaxTemp() {getTemperatureScale() == "F" ? 90 : 30}
@@ -1093,7 +1093,7 @@ def renderTiles() {"""<div class="tiles">\n${allDeviceData()?.collect{renderTile
 def renderWTFCloud() {"""<div data-role="popup" id="wtfcloud-popup" data-overlay-theme="b" class="wtfcloud"><div class="icon cloud" onclick="clearWTFCloud()"><i class="fa fa-cloud"></i></div><div class="icon message" onclick="clearWTFCloud()"><i class="fa fa-question"></i><i class="fa fa-exclamation"></i><i class='fa fa-refresh'></i></div></div>"""}
 
 def link() {
-	if (!params.accessToken) return "You are not authorized to view OAuth access token"
+	if (!params.access_token) return ["You are not authorized to view OAuth access token"]
 	render contentType: "text/html", data: """<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /></head><body style="margin: 0;"><div style="padding:10px">${title ?: location.name} SmartTiles URL:</div><textarea rows="9" cols="30" style="font-size:10px; width: 100%">${generateURL("ui").join()}</textarea><div style="padding:10px">Copy the URL above and tap Done.</div></body></html>"""
 }
 
@@ -1112,7 +1112,7 @@ def historyNav() {
 }
 
 def history() {
-	if (!showHistory) return ["history disabled"]
+	if (!showHistory || disableDashboard) return ["history disabled"]
 	render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'>${historyNav()}<ul class="history list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""
 }
 
