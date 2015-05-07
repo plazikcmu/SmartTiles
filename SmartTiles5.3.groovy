@@ -1112,9 +1112,9 @@ def list() {render contentType: "text/html", data: """<!DOCTYPE html><html><head
 def historyNav() {
 """
 <div style="" class="historyNav">
-<i class="fa fa-fw fa-arrow-left"></i>
-<i class="fa fa-fw fa-refresh"></i>
-<i class="fa fa-fw fa-chevron-up"></i>
+<i class="fa fa-fw fa-arrow-left" onclick="window.history.back();"></i>
+<i class="fa fa-fw fa-refresh" onclick="location.reload();"></i>
+<i class="fa fa-fw fa-chevron-up" onclick="scroll(0, 0);"></i>
 </div>
 """
 }
