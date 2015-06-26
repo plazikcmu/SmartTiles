@@ -38,6 +38,8 @@
 .thermostat .icon.up, .thermostat .icon.down
 .music i, .themeLight, .camera, .light, .history {cursor: pointer;}
 
+.thermostat.null-setpoint {cursor:default}
+
 /* reset ***********************/
 body, .ui-page{background-color:black}
 * {text-shadow:none;font-family:"Mallanna",Verdana,Arial,Helvetica,sans-serif}
