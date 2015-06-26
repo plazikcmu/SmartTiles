@@ -92,6 +92,10 @@ html body .spinCold .ui-group-theme-a .ui-btn, .ui-page-theme-a .ui-btn{border:0
 .thermostatHeat .icon.up, .thermostatCool .icon.up {margin-top: -3em; font-size:2em; line-height:2em;}
 .thermostatHeat .icon.down, .thermostatCool .icon.down {margin-top: 1em; font-size:2em; line-height:2em;}
 
+.icon.null-setpoint {display: none}
+.thermostat.null-setpoint  .icon.null-setpoint {display: block}
+.thermostat.null-setpoint .icon.setpoint {display: none}
+
 /**/
 
 .video-container {
