@@ -35,10 +35,10 @@
 .tiles {margin:2px;}
 
 .switch, .dimmer, .dimmerLight, .momentary, .clock, .lock, .refresh, .link, .dashboard, .menu,
-.thermostat .icon.up, .thermostat .icon.down
+.thermostat .icon.up, .thermostat .icon.down,
 .music i, .themeLight, .camera, .light, .history {cursor: pointer;}
 
-.thermostat.null-setpoint {cursor:default}
+.thermostat.null-setpoint .icon{cursor:default}
 
 /* reset ***********************/
 body, .ui-page{background-color:black}
