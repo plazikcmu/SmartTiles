@@ -599,7 +599,7 @@ def footer() {
 		gutterY:cellGutter,
 		cellW:cellSize,
 		cellH:cellSize,
-		fixSize:1,
+		fixSize:null,
 		onResize: function() {
 			wall.fitWidth();
 			wall.refresh();
@@ -802,9 +802,9 @@ def renderTile(data) {
 	} else if (data.tile == "dashboard") {
 		return """<div class="dashboard tile" data-link-i="$data.i"><div class="title">$data.name</div><div class="icon"><a href="$data.link" data-ajax="false"><i class="fa fa-link"></i></a></div></div>"""
 	} else if (data.tile == "video") {
-		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="1"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><param name="movie" value="$data.link"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param><embed src="$data.link" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="240" height="164" wmode="opaque"></embed></object></div></div>"""
+		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="0"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><param name="movie" value="$data.link"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param><embed src="$data.link" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="240" height="164" wmode="opaque"></embed></object></div></div>"""
 	} else if (data.tile == "genericMJPEGvideo") {
-		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="1"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><img src="$data.link" width="240" height="164"></object></div></div>"""
+		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="0"><div class="title">$data.name</div><div class="icon" style="margin-top:-82px;"><object width="240" height="164"><img src="$data.link" width="240" height="164"></object></div></div>"""
 	} else if (data.tile == "refresh") {
 		return """<div class="refresh tile clickable"><div class="title">Refresh</div><div class="footer">Updated $data.ts</div></div>"""
 	} else if (data.tile == "history") {
@@ -845,7 +845,7 @@ def getTileIcons() {
 		temperature : "<i class='fa fa-fw wi wi-thermometer st-temperature'></i>",
 		energy : "<i class='fa fa-fw wi wi-lightning st-energy'></i>",
 		power : "<i class='fa fa-fw fa-bolt st-power'></i>",
-		battery : "<i class='fa fa-fw fa-fw batt st-battery'></i>",
+		battery : """<i class='fa fa-fw fa-fw batt st-battery'><?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg enable-background="new 0 0 96 96" height="96px" id="battery" version="1.1" viewBox="0 0 96 96" width="96px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M84,32c0-6.63-5.37-12-12-12H12C5.37,20,0,25.37,0,32v32c0,6.63,5.37,12,12,12h60c6.63,0,12-5.37,12-12  c6.63,0,12-5.37,12-12v-8C96,37.37,90.63,32,84,32z M76,64c0,2.21-1.79,4-4,4H12c-2.21,0-4-1.79-4-4V32c0-2.21,1.79-4,4-4h60  c2.21,0,4,1.79,4,4V64z M88,52c0,2.21-1.79,4-4,4V40c2.21,0,4,1.79,4,4V52z"/></svg></i>""",
         "hello-home" : "<i class='fa fa-fw fa-comment-o st-hello-home'></i>",
         link : "<i class='fa fa-fw fa-link st-link'></i>",
         dashboard : "<i class='fa fa-fw fa-th st-dashboard'></i>",
