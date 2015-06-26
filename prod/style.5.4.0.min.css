@@ -137,6 +137,8 @@ div.ui-slider{height:21px;}
     transform: rotate(270deg);
 }
 
+.batt:before {content: "\0000a0"}
+
 /** music ****/
 
 .music .ui-slider.ui-mini{padding:0 10px 0 40px;}
