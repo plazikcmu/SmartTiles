@@ -626,7 +626,6 @@ def headHistory() {
 <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
 <script src="https://625alex.github.io/SmartTiles/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
 <style>
-.batt {background-size: 20px 20px;}
 ${getThemeLightIcon().css}
 </style>
 """
@@ -685,7 +684,6 @@ def headList() {
 	}
 </script>
 <style>
-.batt {background-size: 20px 20px;}
 ${getThemeLightIcon().css}
 </style>
 """
@@ -1111,7 +1109,7 @@ def historyNav() {
 
 def history() {
 	if (!showHistory || disableDashboard) return ["history disabled"]
-	render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}</head><body class='theme-$theme'>${historyNav()}<ul class="history-list list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""
+	render contentType: "text/html", data: """<!DOCTYPE html><html><head>${headHistory()}${customCSS()} \n<style>${state.customCSS ?: ""}</style></head><body class='theme-$theme'>${historyNav()}<ul class="history-list list">\n${getAllDeviceEvents()?.collect{renderEvent(it)}.join("\n")}</ul></body></html>"""
 }
 
 def customCSS() {
