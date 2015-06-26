@@ -802,7 +802,7 @@ def renderTile(data) {
 	} else if (data.tile == "video") {
 		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="0"><div class="title">$data.name</div><div class="video-container"><object width="240" height="164"><param name="movie" value="$data.link"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param><embed src="$data.link" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="240" height="164" wmode="opaque"></embed></object></div></div>"""
 	} else if (data.tile == "genericMJPEGvideo") {
-		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="0"><div class="title">$data.name</div><div class="video-container"><object width="240" height="164"><img src="$data.link" width="240" height="164"></object></div></div>"""
+		return """<div class="video tile h2 w2" data-link-i="$data.i" data-fixSize="0"><div class="title">$data.name</div><div class="video-container"><img src="$data.link"/></div></div>"""
 	} else if (data.tile == "refresh") {
 		return """<div class="refresh tile clickable"><div class="title">Refresh</div><div class="footer">Updated $data.ts</div></div>"""
 	} else if (data.tile == "history") {

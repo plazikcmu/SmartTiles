@@ -95,7 +95,12 @@ html body .spinCold .ui-group-theme-a .ui-btn, .ui-page-theme-a .ui-btn{border:0
 /**/
 
 .video-container {
-	font-size:3em;line-height:3em;width:100%;margin-top: -1.5em;position: absolute;text-align: center;top: 50%;white-space:nowrap;
+	width:100%;
+	margin-top: -25%;
+	position: absolute;
+	text-align: center;
+	top: 50%;
+	white-space:nowrap;
 }
 
 /*******/
