@@ -239,7 +239,7 @@ function sendCommand(type, device, command, value) {
 }
 
 function doPoll(func) {
-	nextPoll(20);
+	nextPoll(5);
 	if (!func) spinner($(".refresh"));
 	var access_token = getUrlParameter("access_token");
 	var request = {ts:stateTS};
@@ -344,7 +344,7 @@ function nextPoll(timeout) {
 	polling = setInterval(function () {doPoll()}, timeout * 1000);
 }
 
-nextPoll(30);
+nextPoll(5);
 
 function refresh(timeout) {
 	if (!timeout) {
